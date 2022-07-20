@@ -9,5 +9,5 @@ const $ = cheerio.load(readableHtml)
 
 
 $("body > main > div.container.mt-2 > div > div.w3-col.s12.mt-1").find("li").each(function(i, link){
-    console.log($(link).find('img[alt="Size"]').prev())
+    console.log($(link).find('img[alt="Size"]').parent("div").text())
 })
