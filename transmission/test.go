@@ -42,7 +42,8 @@ func main() {
 	}
 
 	// Connect
-	if err := c.Dial("wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self", ""); err != nil {
+  //wss://demo.piesocket.com/v3/channel_1?api_key=VCXCEuvhGcBDP7XhiJJUDvR1e1D3eiVjgZ9VRiaV&notify_self
+	if err := c.Dial("ws://localhost:5000/ws", ""); err != nil {
 		log.Fatal(err)
 	}
 
@@ -68,4 +69,3 @@ func main() {
 	}
 
 }
- 
