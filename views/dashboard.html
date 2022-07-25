@@ -22,7 +22,7 @@
 
 <body class="">
   <div class="wrapper">
-    <div class="sidebar">
+    <div class="sidebar" data="blue">
       <!--
         Tip 1: You can change the color of the sidebar using: data-color="blue | green | orange | red"
     -->
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <div class="main-panel">
+    <div class="main-panel" data="blue">
       <!-- Navbar -->
       <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent">
         <div class="container-fluid">
@@ -177,11 +177,21 @@
           <div class="col-lg-4">
             <div class="card card-chart">
               <div class="card-header">
-                <h5 class="card-category">Completed Tasks</h5>
-                <h3 class="card-title"><i class="tim-icons icon-send text-success"></i> 12,100K</h3>
+                  <h3 class="card-title"></i><%= it.imdbData.title %> </h3>
               </div>
               <div class="card-body">
-                <div class="chart-area">
+                <div class="row">
+                  <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                    <img src="<%= it.imdbData.image %>" alt="">
+                  </div>
+                  <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                    <div class="card-header">
+                        <h5>Rating: <%= it.imdbData.imDbRating %></h5>
+                        <h5>Year: <%= it.imdbData.year %></h5>
+                        <h5>PG: <%= it.imdbData.contentRating %></h5>
+                    </div>
+                    <p><%= it.imdbData.plot %></p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -254,13 +264,12 @@
                         </td>
                         <td class="td-actions text-right">
                           <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                            <a href="/">
+                            <a href="<%= srch.magnetLink %>">
                               <i class="tim-icons icon-cloud-download-93"></i>
                             </a>
                           </button>
                         </td>
                       </tr>
-                      <% console.log(srch) %>
                       <% }) %>
                     </tbody>
                   </table>
@@ -348,9 +357,6 @@
   <script src="/assets/js/core/popper.min.js"></script>
   <script src="/assets/js/core/bootstrap.min.js"></script>
   <script src="/assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-  <!--  Google Maps Plugin    -->
-  <!-- Place this tag in your head or just before your close body tag. -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
   <!-- Chart JS -->
   <script src="/assets/js/plugins/chartjs.min.js"></script>
   <!--  Notifications Plugin    -->
