@@ -27,16 +27,18 @@ app.get("/search", async (req,res)=> {
       res.setStatus(400).send({status:400, error:'no valid search query'})
     }
 
-  const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_l3xhyg33/${req.query.q}`)
-  const id = await imdbRes.json()
-  const imdbData = await fetch(`https://imdb-api.com/en/API/Title/k_l3xhyg33/${id.results[0].id}`)
+  //const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_l3xhyg33/${req.query.q}`)
+  //const id = await imdbRes.json()
+  //const imdbData = await fetch(`https://imdb-api.com/en/API/Title/k_l3xhyg33/${id.results[0].id}`)
 
 
   const search = await fetch(`http://localhost:5000/api/search?q=${req.query.q}`)
   console.log(search);
 
 
-  res.render("dashboard", { searchResult: await search.json(), imdbData: await imdbData.json() })
+  //res.render("dashboard", { searchResult: await search.json(), imdbData: await imdbData.json() })
+  res.render("dashboard", { searchResult: await search.json()})
+
 })
 
 app.listen(port);

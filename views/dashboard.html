@@ -174,45 +174,61 @@
       <!-- End Navbar -->
       <div class="content">
         <div class="row">
+
+<div class="col-lg-4">
+</div>
+          <!-- IMDb STUFF
           <div class="col-lg-4">
-            <div class="card card-chart">
-              <div class="card-header">
-                  <h3 class="card-title"></i><%= it.imdbData.title %> </h3>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                    <img src="<%= it.imdbData.image %>" alt="">
-                  </div>
-                  <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-                    <div class="card-header">
-                        <h5>Rating: <%= it.imdbData.imDbRating %></h5>
-                        <h5>Year: <%= it.imdbData.year %></h5>
-                        <h5>PG: <%= it.imdbData.contentRating %></h5>
-                    </div>
-                    <p><%= it.imdbData.plot %></p>
-                  </div>
-                </div>
-              </div>
-            </div>
+
           </div>
+          -->
           <div class="col-8">
             <div class="card card-chart">
               <div class="card-header ">
                 <div class="row">
                   <div class="col-sm-6 text-left">
-                    <h5 class="card-category">Total Shipments</h5>
-                    <h2 class="card-title">Performance</h2>
+                    <h5 class="card-category">Meta Info</h5>
+                    <h2 class="card-title">Files:</h2>
                   </div>
                 </div>
               </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-6 pr-md-1">
-                    <div class="form-group">
-                      <label>First Name</label>
-                      <input type="text" class="form-control" placeholder="Company" value="Mike">
+
+                    <div class="col-lg-12 col-md-12">
+                      <div class="card card-tasks">
+                        <div class="card-body ">
+                          <div class="table-full-width table-responsive">
+                            <table class="table">
+                              <tbody>
+                                <% it.searchResult.forEach(function(srch) {%>
+                                <tr>
+                                  <td>
+                                    <div>
+                                      <i class="tim-icons icon-app"></i>
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <p class="title" id="demo" onclick="test()"><%= srch.name %></p>
+                                    <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
+                                  </td>
+                                  <td class="td-actions text-right">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
+                                      <a href="<%= srch.magnetLink %>">
+                                        <i class="tim-icons icon-cloud-download-93"></i>
+                                      </a>
+                                    </button>
+                                  </td>
+                                </tr>
+                                <% }) %>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+
                   </div>
                   <div class="col-md-6 pl-md-1">
                     <div class="form-group">
@@ -259,7 +275,7 @@
                           </div>
                         </td>
                         <td>
-                          <p class="title"><%= srch.name %></p>
+                          <p class="title" id="demo" onclick="test()"><%= srch.name %></p>
                           <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
                         </td>
                         <td class="td-actions text-right">
@@ -280,6 +296,14 @@
         </div>
       </div>
 
+      <script>
+
+      function test() {
+          const  revqwe1iew = 'dfe'
+        }
+
+
+      </script>
       <footer class="footer">
         <div class="container-fluid">
           <ul class="nav">
