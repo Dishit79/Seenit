@@ -62,7 +62,5 @@ app.get("/ws", async (req, res) => {
 })
 
 
-
-
 app.listen(port);
 console.log(`Opine started on localhost:${port}`)

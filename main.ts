@@ -21,6 +21,19 @@ app.get("/", (req,res)=> {
   res.render("dashboard")
 })
 
+app.get("/search", async (req,res)=> {
+
+  if (!req.query.q) {
+      res.setStatus(400).send({status:400, error:'no valid search query'})
+    }
+
+  const search = await fetch(`http://localhost:5000/api/search?q=${req.query.q}`)
+  console.log(search);
+
+
+  res.render("dashboard", { searchResult: await search.json()})
+})
+
 app.listen(port);
 console.log(`Opine started on localhost:${port}`)
 
