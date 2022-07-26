@@ -163,7 +163,7 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="SEARCH">
+              <input type="text" class="form-control" id="searchInput" placeholder="SEARCH" onkeypress="search(event)">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <i class="tim-icons icon-simple-remove"></i>
               </button>
@@ -175,8 +175,22 @@
       <div class="content">
         <div class="row">
 
-<div class="col-lg-4">
-</div>
+          <div class="col-lg-4">
+            <div class="card card-chart" id="imdbBox">
+              <div class="card-header">
+                  <h3 class="card-title" id="preTitle" >TEST</h3>
+              </div>
+              <div class="card-body">
+                <div class="col-lg-8 ml-auto mr-auto">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <button class="btn btn-primary btn-block" onclick="loadData()">Load show data</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <!-- IMDb STUFF
           <div class="col-lg-4">
 
@@ -194,7 +208,7 @@
               </div>
               <div class="card-body">
                 <div class="row">
-                  <div class="col-md-6 pr-md-1">
+                  <div class="col-md-12 pr-md-1">
 
                     <div class="col-lg-12 col-md-12">
                       <div class="card card-tasks">
@@ -202,10 +216,7 @@
                           <div class="table-full-width table-responsive">
                             <table class="table">
                               <tbody id="fileTable" >
-
-
-
-
+                                <!-- Dynamically loads file data -->
                               </tbody>
                             </table>
                           </div>
@@ -213,38 +224,16 @@
                       </div>
                     </div>
 
-                    <script type="text/javascript">
-
-                    function replace(link) {
-
-                      var table = getElementById('fileTable')
-
-                      const filesRaw = await fetch(`http://localhost:5000/api/info?q=${link}`)
-                      const files = await filesRaw.json()
-
-                      files.forEach( (file) => {
-                        let row = table.insertRow(-1)
-                        let cell1 = row.insertCell(0)
-                        cell1.innerHTML = "<div>i class=\"tim-icons icon-app\"></i>div>"
-                        let cell2 = row.insertCell(1),
-                        cell2.innerHTML = `
-                        <p class="title">f</p>
-                        <p class="text-muted">${file}</p>`
-
-                      });
-
-
-                    }
-
-                    </script>
 
                   </div>
+                  <!-- IMDb STUFF
                   <div class="col-md-6 pl-md-1">
                     <div class="form-group">
                       <label>Last Name</label>
                       <input type="text" class="form-control" placeholder="Last Name" value="Andrew">
                     </div>
                   </div>
+                -->
                 </div>
               </div>
             </div>
@@ -284,7 +273,7 @@
                           </div>
                         </td>
                         <td>
-                          <p class="title" id="demo" onclick="replace(<%= srch.links %>)"><%= srch.name %></p>
+                          <p class="title" id="demo" onclick="replaceData('<%= srch.links %>')"><%= srch.name %></p>
                           <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
                         </td>
                         <td class="td-actions text-right">
@@ -304,6 +293,95 @@
           </div>
         </div>
       </div>
+      <div class="d-flex align-items-center">
+        <strong>Loading...</strong>
+        <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+      </div>
+
+      <script type="text/javascript">
+
+      preloadTitle()
+
+      async function preloadTitle() {
+        var title = document.getElementById('preTitle')
+
+        const params = new URLSearchParams(window.location.search)
+        const afterTitle = (params.get('q'));
+
+        title.innerHTML = afterTitle
+      }
+
+      async function replaceData(link) {
+
+        var table = document.getElementById('fileTable')
+        table.innerHTML = ""
+
+        const filesRaw = await fetch(`http://localhost:5000/api/info?q=${link}`)
+        const files = await filesRaw.json()
+
+        files.forEach( (file) => {
+          let row = table.insertRow(-1)
+          row.innerHTML = `
+          <tr>
+            <td>
+              <div>
+                <i class="tim-icons icon-app"></i>
+              </div>
+            </td>
+            <td>
+              <p class="title" id="demo" onclick="test()">${file}</p>
+              <p class="text-muted">${file}</p>
+            </td>
+            <td class="td-actions text-right">
+            </td>
+          </tr>
+          `
+        });
+      }
+
+      async function loadData() {
+        const params = new URLSearchParams(window.location.search)
+        const title = (params.get('q'));
+
+        const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_l3xhyg33/${title}`)
+        const id = await imdbRes.json()
+        const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_l3xhyg33/${id.results[0].id}`)
+        const imdbData = await imdbDataRaw.json()
+
+        var box = document.getElementById('imdbBox')
+
+        box.innerHTML = ''
+        box.innerHTML = `
+          <div class="card-header">
+              <h3 class="card-title"></i>${imdbData.title}</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                <img src="${imdbData.image}" alt="">
+              </div>
+              <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
+                <div class="card-header">
+                    <h5>Rating: ${imdbData.imDbRating} </h5>
+                    <h5>Year: ${imdbData.year} </h5>
+                    <h5>PG: ${imdbData.contentRating} </h5>
+                </div>
+                <p> ${imdbData.plot} </p>
+              </div>
+            </div>
+          </div>`
+      }
+
+      function search(e) {
+        if(e.key === "Enter") {
+          const value = document.getElementById("searchInput").value;
+          if (value !== "" ){
+            console.log(value);
+            window.location.replace(`http://localhost:5000/search?q=${value}`);
+          }
+        }
+}
+      </script>
 
       <footer class="footer">
         <div class="container-fluid">
