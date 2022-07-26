@@ -201,33 +201,42 @@
                         <div class="card-body ">
                           <div class="table-full-width table-responsive">
                             <table class="table">
-                              <tbody>
-                                <% it.searchResult.forEach(function(srch) {%>
-                                <tr>
-                                  <td>
-                                    <div>
-                                      <i class="tim-icons icon-app"></i>
-                                    </div>
-                                  </td>
-                                  <td>
-                                    <p class="title" id="demo" onclick="test()"><%= srch.name %></p>
-                                    <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
-                                  </td>
-                                  <td class="td-actions text-right">
-                                    <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                                      <a href="<%= srch.magnetLink %>">
-                                        <i class="tim-icons icon-cloud-download-93"></i>
-                                      </a>
-                                    </button>
-                                  </td>
-                                </tr>
-                                <% }) %>
+                              <tbody id="fileTable" >
+
+
+
+
                               </tbody>
                             </table>
                           </div>
                         </div>
                       </div>
                     </div>
+
+                    <script type="text/javascript">
+
+                    function replace(link) {
+
+                      var table = getElementById('fileTable')
+
+                      const filesRaw = await fetch(`http://localhost:5000/api/info?q=${link}`)
+                      const files = await filesRaw.json()
+
+                      files.forEach( (file) => {
+                        let row = table.insertRow(-1)
+                        let cell1 = row.insertCell(0)
+                        cell1.innerHTML = "<div>i class=\"tim-icons icon-app\"></i>div>"
+                        let cell2 = row.insertCell(1),
+                        cell2.innerHTML = `
+                        <p class="title">f</p>
+                        <p class="text-muted">${file}</p>`
+
+                      });
+
+
+                    }
+
+                    </script>
 
                   </div>
                   <div class="col-md-6 pl-md-1">
@@ -275,7 +284,7 @@
                           </div>
                         </td>
                         <td>
-                          <p class="title" id="demo" onclick="test()"><%= srch.name %></p>
+                          <p class="title" id="demo" onclick="replace(<%= srch.links %>)"><%= srch.name %></p>
                           <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
                         </td>
                         <td class="td-actions text-right">
@@ -296,14 +305,6 @@
         </div>
       </div>
 
-      <script>
-
-      function test() {
-          const  revqwe1iew = 'dfe'
-        }
-
-
-      </script>
       <footer class="footer">
         <div class="container-fluid">
           <ul class="nav">
