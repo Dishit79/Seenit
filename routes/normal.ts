@@ -12,7 +12,7 @@ const readableHtml = await rawHtml.text()
 const $ = cheerio.load(readableHtml)
 
 $("body > main > div.container.mt-2 > div > div.w3-col.s12.mt-1").find("li").each(function(i, link){
-  gatheredInfo.push({name: $(link).find('h5 > a').text(), links: $(link).find('h5 > a').attr("href") , type: $(link).find('.category').text(), size: $(link).find('img[alt="Size"]').parent("div").text(), magnetLink: $(link).find('.dl-magnet').attr('href')})
+  gatheredInfo.push({name: $(link).find('h5 > a').text(), links: $(link).find('h5 > a').attr("href") , type: $(link).find('.category').text(), size: $(link).find('img[alt="Size"]').parent("div").text(), seeders: $(link).find('img[alt="Seeder"]').parent("div").text().replace(/\s/g,""),  magnetLink: $(link).find('.dl-magnet').attr('href')})
 })
 
 return gatheredInfo

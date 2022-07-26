@@ -201,7 +201,7 @@
               <div class="card-header ">
                 <div class="row">
                   <div class="col-sm-6 text-left">
-                    <h5 class="card-category">Meta Info</h5>
+                    <h5 class="card-category" id='metaInfo'>Meta Info</h5>
                     <h2 class="card-title">Files:</h2>
                   </div>
                 </div>
@@ -273,8 +273,8 @@
                           </div>
                         </td>
                         <td>
-                          <p class="title" id="demo" onclick="replaceData('<%= srch.links %>')"><%= srch.name %></p>
-                          <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code></p>
+                          <p class="title" onclick="replaceData('<%= srch.links %>','<%= srch.name %>')"><%= srch.name %></p>
+                          <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code> | <b>Seeders:</b> <code><%= srch.seeders %></code></p>
                         </td>
                         <td class="td-actions text-right">
                           <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
@@ -293,10 +293,6 @@
           </div>
         </div>
       </div>
-      <div class="d-flex align-items-center">
-        <strong>Loading...</strong>
-        <div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
-      </div>
 
       <script type="text/javascript">
 
@@ -311,9 +307,11 @@
         title.innerHTML = afterTitle
       }
 
-      async function replaceData(link) {
+      async function replaceData(link, name) {
 
         var table = document.getElementById('fileTable')
+        var metaInfo = document.getElementById('metaInfo')
+        metaInfo.innerHTML = name
         table.innerHTML = ""
 
         const filesRaw = await fetch(`http://localhost:5000/api/info?q=${link}`)
