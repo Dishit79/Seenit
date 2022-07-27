@@ -33,6 +33,59 @@ https://stackoverflow.com/questions/16270761/how-to-insert-a-large-block-of-html
 
 
 
+let t = false
+
+const socket = new WebSocket('ws://localhost:5000/ws')
+
+
+socket.addEventListener('open', function (event) {
+    socket.send('Hello Server!')
+    t = true
+})
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    console.log('Message from server ', event.data)
+})
+
+function test() {
+  if (t){
+     socket.send("test")
+  }
+}
+
+//setInterval(()=>{ test() }, 1000 )
+
+
+
+const handleSocket = async (socket: WebSocket) => {
+
+  socket.addEventListener("close", () => {
+    console.log("Socket closed");
+  });
+
+  socket.addEventListener("open", () => {
+    console.log("[server]: ping");
+    socket.send("ping");
+    //autoSend(socket)
+  });
+
+  socket.addEventListener("message", async (e) => {
+    if (e.data === "ping") {
+      console.log("[server]: pong");
+      socket.send("pong");
+    } else if (e.data === "pong") {
+      socket.close();
+    } else {
+      console.log(e.data);
+      let d = { route: '/help', data:{ time:"2:04"}}
+      socket.send(JSON.stringify(d))
+    }
+  })
+}
+
+
+
 
 
 <div class="card card-chart">
