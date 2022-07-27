@@ -1,8 +1,6 @@
 import { cheerio } from "https://deno.land/x/cheerio/mod.ts";
 
 
-
-
 export async function bitsearch(query: string) {
 let gatheredInfo = []
 
