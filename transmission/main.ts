@@ -64,7 +64,6 @@ async function sendBack(id:string) {
   })
 
   console.log();
-
 }
 
 app.post("/torrent/add", async (req, res) => {

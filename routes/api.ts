@@ -3,6 +3,8 @@ import { bitsearch, bitsearchInfo} from "./normal.ts";
 import { Database } from 'https://deno.land/x/aloedb/mod.ts';
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
+const API = "10.0.0.140:5050"
+
 function generateId() {
   return v4.generate();
 }
@@ -77,7 +79,7 @@ async function downloadHandler(magnet:MagnetObject) {
 
   let t = await db.findOne({ downloaded:  1 });
   if (!t){
-    await fetch("http://127.0.0.1:5050/torrent/add", {
+    await fetch(`${API}/torrent/add`, {
       method: "POST",
       body: new URLSearchParams({
         'id': magnet.id,
@@ -90,7 +92,7 @@ async function downloadHandler(magnet:MagnetObject) {
 }
 
 
-api.post("/add", async (req,res) => {
+api.post("/torrent/add", async (req,res) => {
    console.log(req.body.magnetLink);
    const uri = req.body.magnetLink
    let magnet = new MagnetObject(uri, '/Documents/')

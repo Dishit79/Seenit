@@ -273,6 +273,11 @@
                           <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code> | <b>Seeders:</b> <code><%= srch.seeders %></code></p>
                         </td>
                         <td class="td-actions text-right">
+                          <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task" onclick="addTorrent('<%= srch.magnetLink %>')">
+                              <i class="tim-icons icon-tv-2"></i>
+                          </button>
+                        </td>
+                        <td class="td-actions text-right">
                           <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
                             <a href="<%= srch.magnetLink %>">
                               <i class="tim-icons icon-cloud-download-93"></i>
@@ -310,7 +315,7 @@
         metaInfo.innerHTML = name
         table.innerHTML = ""
 
-        const filesRaw = await fetch(`http://localhost:5000/api/info?q=${link}`)
+        const filesRaw = await fetch(`http://${window.location.host}/api/info?q=${link}`)
         const files = await filesRaw.json()
 
         files.forEach( (file) => {
@@ -337,9 +342,9 @@
         const params = new URLSearchParams(window.location.search)
         const title = (params.get('q'));
 
-        const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_l3xhyg33/${title}`)
+        const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_lvt14v8j/${title}`)
         const id = await imdbRes.json()
-        const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_l3xhyg33/${id.results[0].id}`)
+        const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_lvt14v8j/${id.results[0].id}`)
         const imdbData = await imdbDataRaw.json()
 
         var box = document.getElementById('imdbBox')
@@ -371,10 +376,24 @@
           const value = document.getElementById("searchInput").value;
           if (value !== "" ){
             console.log(value);
-            window.location.replace(`http://localhost:5000/search?q=${value}`);
+            window.location.replace(`http://${window.location.host}/search?q=${value}`);
             }
           }
         }
+
+      async function addTorrent(torrent) {
+        console.log(window.location.host);
+
+        msg = "Added files to the download queue. Check out <b>Console</b>"
+
+        demo.showNotification('top','center', msg)
+
+        const response = await fetch(`http://${window.location.host}/api/torrent/add`, {
+          method: "POST",
+          body: new URLSearchParams({'magnetLink': torrent})
+        })
+
+      }
 
       </script>
 
