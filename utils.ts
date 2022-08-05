@@ -1,0 +1,17 @@
+import { format } from "https://deno.land/std/datetime/mod.ts";
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
+
+
+export function generateId() {
+  return v4.generate();
+}
+
+export async function logger(message:string) {
+  let currentTime = format(new Date(), "yyyy-MM-dd HH:mm:ss")
+  console.log(`[${currentTime}] - ${message}`);
+}
+export function getConfig() {
+
+  const config = await Deno.readTextFile("./config.json");
+  console.log(config);
+}

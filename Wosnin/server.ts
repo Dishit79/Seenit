@@ -39,7 +39,7 @@ export class WosninServer{
         console.log(req);
         return
       }
-      
+
       if (this.routes[req.route]){
         this.routes[req.route](req,socket)
       } else {

@@ -2,6 +2,8 @@ import { opine, serveStatic, urlencoded, Router } from "https://deno.land/x/opin
 import { dirname, join } from "https://deno.land/x/opine/deps.ts";
 import { renderFile } from "https://deno.land/x/eta/mod.ts";
 import { api } from "./routes/api.ts"
+import { torrent } from "./routes/torrent.ts"
+import { logger } from "./utils.ts"
 
 
 const app = opine()
@@ -16,6 +18,8 @@ app.set("view cache", false)
 app.set('trust proxy', true)
 app.use(urlencoded());
 app.use("/api", api)
+app.use("/api/torrent", torrent)
+
 
 app.get("/", (req,res)=> {
   res.render("dashboard")
@@ -28,7 +32,8 @@ app.get("/search", async (req,res)=> {
     }
 
   const search = await fetch(`http://localhost:5000/api/search?q=${req.query.q}`)
-  console.log(search);
+
+  logger("Search endpoint hit")
 
   res.render("dashboard", { searchResult: await search.json()})
 
