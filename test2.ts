@@ -6,24 +6,10 @@ async function getConfig() {
   } catch (e) {
     //console.log(error)
     if (e instanceof Deno.errors.NotFound) {
-      console.log("YOOOO");
-    } else 
-
+      console.log("ttt");
+    } else if (e instanceof SyntaxError)
+      console.log(e);
   }
 }
 
 let t = await getConfig()
-//console.log(t.SERVER);
-
-
-
-
-
-// import { parse } from "https://deno.land/std/encoding/jsonc.ts";
-//
-// async function getConfig() {
-//   const config = JSON.parse(Deno.readTextFileSync("config.json"))
-//   console.log(config);
-// }
-//
-// await getConfig()
