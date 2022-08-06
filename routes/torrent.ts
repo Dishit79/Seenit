@@ -9,6 +9,7 @@ export const torrent = new Router
 const config = await getConfig()
 
 const api = config.server
+const ws = config.wsServer
 
 interface Mag {
     id: string
@@ -104,4 +105,10 @@ torrent.post("/completed", async (req,res) => {
 torrent.get("/current", async (req,res) => {
   const currentTorrent = await getRunningMag()
   res.send(currentTorrent)
+})
+
+torrent.get("/current/ws/", async (req,res) => {
+  const currentTorrent = await getRunningMag()
+  const result = {id: currentTorrent.id, websocketLink: `ws://${ws}/ws/${currentTorrent.id}`}
+  res.send(result)
 })

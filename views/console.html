@@ -1,0 +1,63 @@
+<% layout('layout.html', {page: 'Console'}) %>
+
+
+<div class="row">
+
+  <div class="col-12">
+    <div class="card card-chart">
+      <div class="card-header ">
+        <div class="row">
+          <div class="col-sm-6 text-left">
+            <h5 class="card-category" id='metaInfo'>Meta Info</h5>
+            <h2 class="card-title">Files:</h2>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 pr-md-1">
+
+            <div class="col-12 overflow-auto">
+              <div class="card card-tasks">
+                <div class="card-body">
+                  <div>
+                    <blockquote>
+                      <p class="blockquote blockquote-muted">
+                        <code id="log" class="overflow-auto"></code>
+                      </p>
+                    </blockquote>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+  main()
+
+  async function main() {
+
+    const rawLink = await fetch(`http://${window.location.host}/api/torrent/current/ws`)
+    const link = await rawLink.json()
+
+    console.log(link);
+
+    const socket = new WebSocket(link.websocketLink)
+    socket.onmessage = (event) => this.onMessage(event);
+  }
+
+  function onMessage(e) {
+    document.getElementById('log').innerHTML += (e.data + "<br>");
+  }
+
+
+</script>

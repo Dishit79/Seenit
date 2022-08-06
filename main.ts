@@ -22,7 +22,7 @@ app.use("/api", api)
 app.use("/api/torrent", torrent)
 
 
-const checks = [{name:'server', type:"string"}]
+const checks = [{name:'server', type:"string"},{name:'wsServer', type:"string"}]
 await validateConfig(checks)
 
 
@@ -42,6 +42,10 @@ app.get("/search", async (req,res)=> {
 
   res.render("dashboard", { searchResult: await search.json()})
 
+})
+
+app.get("/console", async (req,res)=> {
+  res.render("console")
 })
 
 

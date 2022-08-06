@@ -1,3 +1,4 @@
 {
-  "server": "http://localhost:5050"
+  "server": "http://localhost:5050",
+  "wsServer": "localhost:5050"
 }
