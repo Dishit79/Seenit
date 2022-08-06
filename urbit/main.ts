@@ -49,7 +49,13 @@ class Instance {
     this.pipeThrough(this.process.stdout, Deno.stdout);
     this.pipeThrough(this.process.stderr, Deno.stderr);
     await this.process.status();
-    //delete file
+
+    await Deno.remove(`${this.id}.txt`)
+
+    //move file to desired loc
+
+    await Deno.remove(this.id, { recursive: true })
+
     console.log("Done!");
     await sendBack(this.id)
   }
@@ -77,11 +83,76 @@ app.post("/torrent/add", async (req, res) => {
 });
 
 
+
+async function exists(filename: string) {
+  try {
+    await Deno.stat(`${filename}.txt`);
+    return true;
+  } catch (e) {
+    if (e && e instanceof Deno.errors.NotFound) {
+      return false;
+    } else {
+      throw e;
+    }
+  }
+}
+
+async function pipeThroughWebsocket(reader: Deno.Reader, process: Deno.Process, socket: WebSocket){
+
+  const encoder = new TextEncoder();
+  for await (const line of readLines(reader)) {
+    if (socket.readyState == 1){
+      socket.send(line)
+    } else {
+      await process.kill('SIGINT')
+      return
+    }
+  }
+}
+
+async function websocketStatus(id: string, socket:WebSocket) {
+
+  const process = Deno.run({
+    cmd: ["tail", "-f", `${id}.txt`],
+    stdout: "piped",
+    stderr: "piped",
+  })
+
+  pipeThroughWebsocket(process.stdout, process, socket);
+  pipeThroughWebsocket(process.stderr, process, socket);
+  await process.status();
+  console.log("Done websocket");
+}
+
+const handleSocket = async (socket: WebSocket, id: string) => {
+
+  socket.addEventListener("close", () => {
+    console.log("Socket closed");
+  });
+
+  socket.addEventListener("open", async () => {
+    console.log("Connected");
+    const check = await exists(id)
+
+    if (check){
+      await websocketStatus(id, socket)
+    } else {
+      socket.close()
+    }
+  })
+}
+
+
+
+
+
+
+//req.params.id
 app.get("/ws/:id", async (req, res) => {
   if (req.headers.get("upgrade") === "websocket") {
     const socket = req.upgrade()
-    console.log("hit");
-    ws.listen(socket)
+    console.log("hit")
+    handleSocket(socket, req.params.id)
   } else {
     res.send("Ok?")
   }
