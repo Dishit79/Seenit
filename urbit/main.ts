@@ -20,10 +20,10 @@ class Instance {
     this.torrent = torrent
   }
 
-  async pipeThrough(reader: Deno.Reader, writer: Deno.Writer,){
+  async pipeThrough(reader: Deno.Reader,){
     const file = await Deno.open(`./${this.id}.txt`, {
       read: true,
-      write: true,
+      append: true,
       create: true,
     })
     const encoder = new TextEncoder();
@@ -33,7 +33,7 @@ class Instance {
         await this.process.kill('SIGINT')
         return
       }
-      await Deno.write(file.rid, new TextEncoder().encode(line));
+       await file.write(new TextEncoder().encode(line + '\n'));
     }
   }
 
@@ -46,8 +46,8 @@ class Instance {
       stderr: "piped",
     })
 
-    this.pipeThrough(this.process.stdout, Deno.stdout);
-    this.pipeThrough(this.process.stderr, Deno.stderr);
+    this.pipeThrough(this.process.stdout);
+    this.pipeThrough(this.process.stderr);
     await this.process.status();
 
     await Deno.remove(`${this.id}.txt`)
@@ -104,6 +104,7 @@ async function pipeThroughWebsocket(reader: Deno.Reader, process: Deno.Process, 
     if (socket.readyState == 1){
       socket.send(line)
     } else {
+      console.log(socket.readyState);
       await process.kill('SIGINT')
       return
     }
@@ -113,7 +114,7 @@ async function pipeThroughWebsocket(reader: Deno.Reader, process: Deno.Process, 
 async function websocketStatus(id: string, socket:WebSocket) {
 
   const process = Deno.run({
-    cmd: ["tail", "-f", `${id}.txt`],
+    cmd: ["tail", "-F", `${id}.txt`],
     stdout: "piped",
     stderr: "piped",
   })
@@ -141,11 +142,6 @@ const handleSocket = async (socket: WebSocket, id: string) => {
     }
   })
 }
-
-
-
-
-
 
 //req.params.id
 app.get("/ws/:id", async (req, res) => {
