@@ -76,6 +76,17 @@ app.post("/torrent/add", async (req, res) => {
   res.send("started")
 });
 
+
+app.get("/ws/:id", async (req, res) => {
+  if (req.headers.get("upgrade") === "websocket") {
+    const socket = req.upgrade()
+    console.log("hit");
+    ws.listen(socket)
+  } else {
+    res.send("Ok?")
+  }
+})
+
 app.listen(port);
 console.log(`Opine started on localhost:${port}`);
 

@@ -10,8 +10,3 @@ export async function logger(message:string) {
   let currentTime = format(new Date(), "yyyy-MM-dd HH:mm:ss")
   console.log(`[${currentTime}] - ${message}`);
 }
-export function getConfig() {
-
-  const config = await Deno.readTextFile("./config.json");
-  console.log(config);
-}

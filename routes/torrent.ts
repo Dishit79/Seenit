@@ -1,10 +1,14 @@
 import { Router } from "https://deno.land/x/opine/mod.ts";
 import { Database } from 'https://deno.land/x/aloedb/mod.ts';
 import { logger, generateId } from "../utils.ts"
+import { getConfig } from "../utils/config.ts"
+
+
 
 export const torrent = new Router
+const config = await getConfig()
 
-const api = "http://localhost:5050"
+const api = config.server
 
 interface Mag {
     id: string
@@ -53,7 +57,7 @@ async function getIdleMag() {
 async function downloadHandler(magnet:MagnetObject) {
   const torrentRunning = await getRunningMag()
   if (!torrentRunning){
-    await fetch(`${api  }/torrent/add`, {
+    await fetch(`${api}/torrent/add`, {
       method: "POST",
       body: new URLSearchParams({
         'id': magnet.id,

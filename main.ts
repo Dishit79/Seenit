@@ -4,6 +4,7 @@ import { renderFile } from "https://deno.land/x/eta/mod.ts";
 import { api } from "./routes/api.ts"
 import { torrent } from "./routes/torrent.ts"
 import { logger } from "./utils.ts"
+import { validateConfig, getConfig } from "./utils/config.ts"
 
 
 const app = opine()
@@ -19,6 +20,10 @@ app.set('trust proxy', true)
 app.use(urlencoded());
 app.use("/api", api)
 app.use("/api/torrent", torrent)
+
+
+const checks = [{name:'server', type:"string"}]
+await validateConfig(checks)
 
 
 app.get("/", (req,res)=> {
