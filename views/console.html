@@ -30,9 +30,7 @@
                 </div>
               </div>
             </div>
-
           </div>
-
         </div>
       </div>
     </div>
@@ -41,6 +39,8 @@
 
 
 <script type="text/javascript">
+
+  let numMsg = 0
 
   main()
 
@@ -56,7 +56,14 @@
   }
 
   function onMessage(e) {
-    document.getElementById('log').innerHTML += (e.data + "<br>");
+    numMsg += 1
+    if (numMsg > 10) {
+      document.getElementById('log').innerHTML = "";
+      document.getElementById('log').innerHTML += (e.data + "<br>");
+      numMsg = 0
+    } else {
+      document.getElementById('log').innerHTML += (e.data + "<br>");
+    }
   }
 
 

@@ -3,7 +3,11 @@ import {readableStreamFromReader,writableStreamFromWriter,} from "https://deno.l
 import { mergeReadableStreams } from "https://deno.land/std/streams/merge.ts";
 import { TextLineStream } from "https://deno.land/std@0.144.0/streams/mod.ts";
 import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
+import { getConfig, validateConfig  } from "https://gist.githubusercontent.com/Dishit79/65f0c7b8188557c86d68022dfa07f543/raw/47c86def8ebe51754eb17179eb844385ef31c8f5/config.ts";
 
+const checks = [{name:'server', type:"string"},{name:'unixName', type:"string"}]
+await validateConfig(checks)
+const config = await getConfig()
 
 const app = opine();
 const port = 5050;
@@ -54,7 +58,8 @@ class Instance {
 
     //move file to desired loc
 
-    await Deno.remove(this.id, { recursive: true })
+    //const move3 = Deno.run({cmd: ["mkdir",  `/home/nawaf/${this.id}`]})
+    const move = Deno.run({cmd: ["mv", `${this.id}`, `/home/${config.unixName}/`]})
 
     console.log("Done!");
     await sendBack(this.id)
@@ -63,13 +68,11 @@ class Instance {
 
 async function sendBack(id:string) {
 
-  let t = await fetch("http://127.0.0.1:5000/api/torrent/completed", {
+  let t = await fetch(`${config.server}/api/torrent/completed`, {
     method: "POST",
     body: new URLSearchParams({
       'id': id})
   })
-
-  console.log();
 }
 
 app.post("/torrent/add", async (req, res) => {
@@ -104,7 +107,6 @@ async function pipeThroughWebsocket(reader: Deno.Reader, process: Deno.Process, 
     if (socket.readyState == 1){
       socket.send(line)
     } else {
-      console.log(socket.readyState);
       await process.kill('SIGINT')
       return
     }
