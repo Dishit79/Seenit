@@ -27,8 +27,13 @@ await validateConfig(checks)
 
 
 app.get("/", (req,res)=> {
+  res.render("index")
+})
+
+app.get("/dash", (req,res)=> {
   res.render("dashboard")
 })
+
 
 app.get("/search", async (req,res)=> {
 
