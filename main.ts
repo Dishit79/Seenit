@@ -12,7 +12,7 @@ const port = 5000
 const __dirname = dirname(import.meta.url)
 
 app.engine(".html", renderFile);
-app.use('/assets', serveStatic(join(__dirname, "assets")));
+// app.use('/assets', serveStatic(join(__dirname, "assets")));
 app.set("view engine", "html");
 
 app.set("view cache", false)
@@ -27,8 +27,13 @@ await validateConfig(checks)
 
 
 app.get("/", (req,res)=> {
+  res.render("index")
+})
+
+app.get("/dash", (req,res)=> {
   res.render("dashboard")
 })
+
 
 app.get("/search", async (req,res)=> {
 

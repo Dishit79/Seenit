@@ -1,226 +1,118 @@
 <% layout('layout.html', {page: 'Dashboard'})%>
 
 
-<div class="row">
+<div class="container mx-auto mt-6 center">
 
-  <div class="col-lg-4">
-    <div class="card card-chart" id="imdbBox">
-      <div class="card-header">
-          <h3 class="card-title" id="preTitle" >IMDb</h3>
-      </div>
+  <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
+    <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
-        <div class="col-lg-8 ml-auto mr-auto">
-          <div class="row">
-            <div class="col-md-12">
-              <button class="btn btn-primary btn-block" onclick="loadData()">Load show data</button>
-            </div>
-          </div>
-        </div>
+        <h2 class="card-title">Search:</h2>
+        <input type="text" placeholder="Type here" class="input input-bordered " />
       </div>
     </div>
   </div>
 
-  <div class="col-8">
-    <div class="card card-chart">
-      <div class="card-header ">
-        <div class="row">
-          <div class="col-sm-6 text-left">
-            <h5 class="card-category" id='metaInfo'>Meta Info</h5>
-            <h2 class="card-title">Files:</h2>
-          </div>
-        </div>
-      </div>
+
+
+  <div class="grid gap-4 grid-cols-2 grid-rows-1 mt-10">
+    <div class="card card-side bg-base-100 shadow-xl">
+      <img width="200" height="200" src="https://m.media-amazon.com/images/M/MV5BN2NkYTdlYjAtNWY5NC00MTY0LWIyZTItNmViMWJjNWM3YzUzXkEyXkFqcGdeQXVyMTE2NTYzNTQy._V1_Ratio0.7046_AL_.jpg" alt="Movie">
       <div class="card-body">
-        <div class="row">
-          <div class="col-md-12 pr-md-1">
-
-            <div class="col-lg-12 col-md-12">
-              <div class="card card-tasks">
-                <div class="card-body ">
-                  <div class="table-full-width table-responsive">
-                    <table class="table">
-                      <tbody id="fileTable" >
-                        <!-- Dynamically loads file data -->
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-          </div>
-          <!-- IMDb STUFF
-          <div class="col-md-6 pl-md-1">
-            <div class="form-group">
-              <label>Last Name</label>
-              <input type="text" class="form-control" placeholder="Last Name" value="Andrew">
-            </div>
-          </div>
-        -->
+        <h2 class="card-title">Lakshya<div class="badge badge-primary">5.3</div></h2>
+        <h5>Year: 2021</h5>
+        <h5>PG: null </h5>
+        <p>Pardhu is an archer who wants to represent India at the World Championships. How does he bounce back and achieve what he wants after losing track? </p>
+        <div class="card-actions justify-end">
+          <button class="btn btn-primary"><a href="/">IMdB</a></button>
         </div>
       </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-lg-12 col-md-12">
-    <div class="card card-tasks">
-      <div class="card-header ">
-        <h6 class="title d-inline">Tasks(5)</h6>
-        <p class="card-category d-inline">today</p>
-        <div class="dropdown">
-          <button type="button" class="btn btn-link dropdown-toggle btn-icon" data-toggle="dropdown">
-            <i class="tim-icons icon-settings-gear-63"></i>
-          </button>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-            <a class="dropdown-item" href="#pablo">Action</a>
-            <a class="dropdown-item" href="#pablo">Another action</a>
-            <a class="dropdown-item" href="#pablo">Something else</a>
-          </div>
-        </div>
-      </div>
-      <div class="card-body ">
-        <div class="table-full-width table-responsive">
-          <table class="table">
-            <tbody>
-              <% it.searchResult.forEach(function(srch) {%>
+
+    <div class="card card-side bg-base-100 shadow-xl">
+      <div class="card-body">
+        <div class="overflow-auto w-full h-64">
+          <h2 class="card-title">Files</h2>
+          <table class="table-normal overflow-auto w-full">
+            <!-- head -->
+            <thead>
               <tr>
+                <th>Download</th>
+                <th>Filename</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>
+                  <label>
+                    <input type="checkbox" class="checkbox"/>
+                  </label>
+                </th>
                 <td>
-                  <div class="form-check">
-                    <label class="form-check-label">
-                      <input class="form-check-input" type="checkbox" value="">
-                      <span class="form-check-sign">
-                        <span class="check"></span>
-                      </span>
-                    </label>
-                  </div>
-                </td>
-                <td>
-                  <p class="title" onclick="replaceData('<%= srch.links %>','<%= srch.name %>')"><%= srch.name %></p>
-                  <p class="text-muted"> <b>Type:</b> <code><%= srch.type %></code> | <b>Size:</b> <code><%= srch.size %></code> | <b>Seeders:</b> <code><%= srch.seeders %></code></p>
-                </td>
-                <td class="td-actions text-right">
-                  <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task" onclick="addTorrent('<%= srch.magnetLink %>')">
-                      <i class="tim-icons icon-tv-2"></i>
-                  </button>
-                </td>
-                <td class="td-actions text-right">
-                  <button type="button" rel="tooltip" title="" class="btn btn-link" data-original-title="Edit Task">
-                    <a href="<%= srch.magnetLink %>">
-                      <i class="tim-icons icon-cloud-download-93"></i>
-                    </a>
-                  </button>
+                  Molodoy-Chelovek_FTR-1_S_RU-XX_51-HI-VI_2K_20220606_VF-1_audio_01.mxf - 8 GB
                 </td>
               </tr>
-              <% }) %>
+            </tbody>
+          </table>
+          <button class="btn btn-ghost btn-xs">details</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title">Files Found</h2>
+        <p>Testing dsfsdfsdfsd</p>
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <!-- head -->
+            <thead>
+              <tr>
+                <th>File Name</th>
+                <th>Type</th>
+                <th>Seeders</th>
+                <th>Size</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- row 1 -->
+              <tr>
+                <th>1980 ACDC - Back In Black (2020 Hi-Res 24.96) flac</th>
+                <td>Other/Audio</td>
+                <td>129</td>
+                <td>1.04 GB</td>
+                <td>
+                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-tv"></i></button>
+                </td>
+                <td>
+                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <th>1980 ACDC - Back In Black (2020 Hi-Res 24.96) flac</th>
+                <td>Other/Audio</td>
+                <td>129</td>
+                <td>1.04 GB</td>
+                <td>
+                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-tv"></i></button>
+                </td>
+                <td>
+                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button>
+                </td>
+              </tr>
+              
+
             </tbody>
           </table>
         </div>
       </div>
     </div>
+
   </div>
+
 </div>
-
-
-<script type="text/javascript">
-
-preloadTitle()
-
-async function preloadTitle() {
-  var title = document.getElementById('preTitle')
-
-  const params = new URLSearchParams(window.location.search)
-  const afterTitle = (params.get('q'));
-
-  title.innerHTML = afterTitle
-}
-
-async function replaceData(link, name) {
-
-  var table = document.getElementById('fileTable')
-  var metaInfo = document.getElementById('metaInfo')
-  metaInfo.innerHTML = name
-  table.innerHTML = ""
-
-  const filesRaw = await fetch(`http://${window.location.host}/api/info?q=${link}`)
-  const files = await filesRaw.json()
-
-  files.forEach( (file) => {
-    let row = table.insertRow(-1)
-    row.innerHTML = `
-    <tr>
-      <td>
-        <div>
-          <i class="tim-icons icon-app"></i>
-        </div>
-      </td>
-      <td>
-        <p class="title" id="demo" onclick="test()">${file}</p>
-        <p class="text-muted">${file}</p>
-      </td>
-      <td class="td-actions text-right">
-      </td>
-    </tr>
-    `
-  });
-}
-
-async function loadData() {
-  const params = new URLSearchParams(window.location.search)
-  const title = (params.get('q'));
-
-  const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_lvt14v8j/${title}`)
-  const id = await imdbRes.json()
-  const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_lvt14v8j/${id.results[0].id}`)
-  const imdbData = await imdbDataRaw.json()
-
-  var box = document.getElementById('imdbBox')
-
-  box.innerHTML = ''
-  box.innerHTML = `
-    <div class="card-header">
-        <h3 class="card-title"></i>${imdbData.title}</h3>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-          <img src="${imdbData.image}" alt="">
-        </div>
-        <div class="font-icon-list col-lg-6 col-md-3 col-sm-4 col-xs-6 col-xs-6">
-          <div class="card-header">
-              <h5>Rating: ${imdbData.imDbRating} </h5>
-              <h5>Year: ${imdbData.year} </h5>
-              <h5>PG: ${imdbData.contentRating} </h5>
-          </div>
-          <p> ${imdbData.plot} </p>
-        </div>
-      </div>
-    </div>`
-}
-
-function search(e) {
-  if(e.key === "Enter") {
-    const value = document.getElementById("searchInput").value;
-    if (value !== "" ){
-      console.log(value);
-      window.location.replace(`http://${window.location.host}/search?q=${value}`);
-      }
-    }
-  }
-
-async function addTorrent(torrent) {
-  console.log(window.location.host);
-
-  msg = "Added files to the download queue. Check out <b>Console</b>"
-
-  demo.showNotification('top','center', msg)
-
-  const response = await fetch(`http://${window.location.host}/api/torrent/add`, {
-    method: "POST",
-    body: new URLSearchParams({'magnetLink': torrent})
-  })
-
-}
-
-</script>
