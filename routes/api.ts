@@ -27,3 +27,11 @@ api.get("/info", async (req,res) => {
   let ans = await bitsearchInfo(req.query.q)
   res.send(ans)
 })
+
+api.get("/imdb/:title", async (req,res) => {
+  const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_lvt14v8j/${req.params.title}`)
+  const id = await imdbRes.json()
+  const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_lvt14v8j/${id.results[0].id}`)
+  const imdbData = await imdbDataRaw.json()
+  res.send(imdbData)
+})

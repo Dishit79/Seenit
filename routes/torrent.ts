@@ -4,7 +4,6 @@ import { logger, generateId } from "../utils.ts"
 import { getConfig } from "../utils/config.ts"
 
 
-
 export const torrent = new Router
 const config = await getConfig()
 
@@ -15,6 +14,7 @@ interface Mag {
     id: string
     uri: string
     downloadLocation: string
+    filesToDelete: array[string]
     downloaded: number
 }
 
@@ -25,17 +25,18 @@ export class MagnetObject {
   id: string
   uri: string
   downloadLocation: string
+  filesToDelete: array[string]
   downloaded = 0
 
-  constructor(uri: string, downloadLocation: string, id:string | null = null) {
+  constructor(uri: string, downloadLocation: string, filesToDelete: array[string], id:string | null = null) {
     if (!id){
       this.id = generateId()
     } else {
       this.id = id
     }
-
     this.uri = uri
     this.downloadLocation = downloadLocation
+    this.filesToDelete = filesToDelete
   }
 }
 
@@ -73,18 +74,22 @@ async function downloadHandler(magnet:MagnetObject) {
 async function downloadNext() {
   const idleTorrent = await getIdleMag()
   if (idleTorrent){
-    const mag = new MagnetObject(idleTorrent.uri, idleTorrent.downloadLocation, idleTorrent.id)
+    const mag = new MagnetObject(idleTorrent.uri, idleTorrent.downloadLocation, idleTorrent.filesToDelete, idleTorrent.id)
     await downloadHandler(mag)
   }
 }
 
 torrent.post("/add", async (req,res) => {
-   console.log(req.body.magnetLink);
+
    const uri = req.body.magnetLink
-   let magnet = new MagnetObject(uri, '/Documents/')
+   const filesToDelete = req.body.filesToDelete
+
+   let magnet = new MagnetObject('ewrwerwe', '/Documents/', filesToDelete.split(','))
+   console.log(magnet);
+
    await addMag(magnet)
    await downloadHandler(magnet)
-   logger("Search endpoint hit")
+   logger("Torrent added Urbit server")
    res.send("added to queue")
 })
 
@@ -95,12 +100,6 @@ torrent.post("/completed", async (req,res) => {
    res.send("Thank you ")
 })
 
-torrent.post("/completed", async (req,res) => {
-   console.log(req.body.id);
-   await updateMagStatus(req.body.id, 2)
-   await downloadNext()
-   res.send("Thank you ")
-})
 
 torrent.get("/current", async (req,res) => {
   const currentTorrent = await getRunningMag()

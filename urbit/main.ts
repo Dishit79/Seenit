@@ -41,7 +41,7 @@ class Instance {
     }
   }
 
-  async start() {
+  async start(filesToDelete:array[string]) {
 
     console.log(this.torrent);
     this.process = Deno.run({
@@ -59,7 +59,7 @@ class Instance {
     //move file to desired loc
 
     //const move3 = Deno.run({cmd: ["mkdir",  `/home/nawaf/${this.id}`]})
-    const move = Deno.run({cmd: ["mv", `${this.id}`, `/home/${config.unixName}/`]})
+    const move = Deno.run({cmd: ["mv", `${this.id}`, `/home/${config.unixName}/media/`]})
 
     console.log("Done!");
     await sendBack(this.id)

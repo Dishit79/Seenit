@@ -12,7 +12,7 @@ const port = 5000
 const __dirname = dirname(import.meta.url)
 
 app.engine(".html", renderFile);
-// app.use('/assets', serveStatic(join(__dirname, "assets")));
+//app.use('/assets', serveStatic(join(__dirname, "assets")));
 app.set("view engine", "html");
 
 app.set("view cache", false)
@@ -30,24 +30,20 @@ app.get("/", (req,res)=> {
   res.render("index")
 })
 
-app.get("/dash", (req,res)=> {
-  res.render("dashboard")
-})
-
-
-app.get("/search", async (req,res)=> {
+app.get("/dash", async (req,res)=> {
 
   if (!req.query.q) {
       res.setStatus(400).send({status:400, error:'no valid search query'})
-    }
-
+      }
   const search = await fetch(`http://localhost:5000/api/search?q=${req.query.q}`)
-
-  logger("Search endpoint hit")
-
-  res.render("dashboard", { searchResult: await search.json()})
+  res.render("dashboard", { searchResult: await search.json() })
 
 })
+
+app.get("/con", (req,res)=> {
+  res.render("console")
+})
+
 
 app.get("/console", async (req,res)=> {
   res.render("console")

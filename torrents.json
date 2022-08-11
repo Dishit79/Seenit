@@ -10,5 +10,14 @@
 		"uri": "magnet:?xt=urn:btih:FDC096994B769BA979F2E5B57E930A0AFD898663",
 		"downloadLocation": "/Documents/",
 		"downloaded": 1
+	},
+	{
+		"id": "83442c2d-b82c-433b-8aac-b46434671ee0",
+		"uri": "ewrwerwe",
+		"downloadLocation": "/Documents/",
+		"filesToDelete": [
+			"www.YTS.AM.jpg - 58.1 kB"
+		],
+		"downloaded": 0
 	}
 ]
