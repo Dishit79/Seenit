@@ -84,7 +84,7 @@ torrent.post("/add", async (req,res) => {
    const uri = req.body.magnetLink
    const filesToDelete = req.body.filesToDelete
 
-   let magnet = new MagnetObject('ewrwerwe', '/Documents/', filesToDelete.split(','))
+   let magnet = new MagnetObject('ewrwerwe', '/Documents/', filesToDelete.split(',').replace(/ - [0-9].*/g,""))
    console.log(magnet);
 
    await addMag(magnet)

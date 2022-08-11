@@ -1,26 +1,43 @@
 
 
-// list all the directory in directory
-async function findDir() {
+async function getFiles() {
 
-  const dirNames: string[] = [];
+  const allFileNames: string[] = [];
+  for await (const files of Deno.readDir(`/home/nawaf/Media/`)){
+    allFileNames.push(files.name)
+  }
   for await (const dirEntry of Deno.readDir('/home/nawaf/Media/')) {
     if (dirEntry.isDirectory) {
-      dirNames.push(dirEntry.name);
+      for await (const files of Deno.readDir(`/home/nawaf/Media/${dirEntry.name}`)) {
+        if (files.isFile) {
+          allFileNames.push(files.name)
+          const move = Deno.run({cmd: ["mv", `/home/nawaf/Media/${dirEntry.name}/${files.name}`, `/home/nawaf/Media/`]})
+          await move.close()
+        }
+      }
     }
   }
+  return allFileNames;
+}
 
-  dirNames.forEach(dir => {
-    console.log( `/home/nawaf/Media/${dir}/*`);
-    const move = Deno.run({cmd: ["stat", `/home/nawaf/Media/Movies/*`]})
+async function deleteFiles(allFileNames: string[], filesToDelete: string[]) {
+
+  allFileNames.forEach(async e => {
+    for (let i = 0; i < filesToDelete.length; i++) {
+      const file = filesToDelete[i];
+      if (e == file) {
+        console.log(e);
+        await Deno.remove(`/home/nawaf/Media/${e}`)
+      }
+    }
   });
 }
 
 
 
+let fileNames = await getFiles()
 
-
-await findDir()
+await deleteFiles(fileNames,[ "1.mkv", "3.mp4", "2.png" ] )
 
 // loop thorugh them to bring every file to the parent dir
 
