@@ -14,7 +14,7 @@ interface Mag {
     id: string
     uri: string
     downloadLocation: string
-    filesToDelete: array[string]
+    filesToDelete: string[]
     downloaded: number
 }
 
@@ -25,10 +25,10 @@ export class MagnetObject {
   id: string
   uri: string
   downloadLocation: string
-  filesToDelete: array[string]
+  filesToDelete: string[]
   downloaded = 0
 
-  constructor(uri: string, downloadLocation: string, filesToDelete: array[string], id:string | null = null) {
+  constructor(uri: string, downloadLocation: string, filesToDelete: string[], id:string | null = null) {
     if (!id){
       this.id = generateId()
     } else {
@@ -64,7 +64,8 @@ async function downloadHandler(magnet:MagnetObject) {
       body: new URLSearchParams({
         'id': magnet.id,
         'magnetLink': magnet.uri,
-        'loaction': 'movie'})
+        'filesToDelete': magnet.filesToDelete,
+        'downloadLocation': magnet.downloadLocation })
     })
     await updateMagStatus(magnet.id, 1)
     console.log("Torrent added to server");
@@ -81,16 +82,25 @@ async function downloadNext() {
 
 torrent.post("/add", async (req,res) => {
 
-   const uri = req.body.magnetLink
-   const filesToDelete = req.body.filesToDelete
+  logger("huh?")
+  const uri = req.body.magnetLink
+  const downloadLocation = req.body.downloadLocation
+  const filesToDelete = () => {
+    let files = req.body.filesToDelete.split(',')
+    let filesToDelete = []
+    files.forEach(file => {
+      filesToDelete.push(file.replace(/ - [0-9].*/g,""))
+    })
+    return filesToDelete
+  }
 
-   let magnet = new MagnetObject('ewrwerwe', '/Documents/', filesToDelete.split(',').replace(/ - [0-9].*/g,""))
-   console.log(magnet);
+  let magnet = new MagnetObject(uri, downloadLocation, filesToDelete())
+  console.log(magnet);
 
-   await addMag(magnet)
-   await downloadHandler(magnet)
-   logger("Torrent added Urbit server")
-   res.send("added to queue")
+  await addMag(magnet)
+  await downloadHandler(magnet)
+  logger("Torrent added Urbit server")
+  res.send("added to queue")
 })
 
 torrent.post("/completed", async (req,res) => {

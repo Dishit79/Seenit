@@ -1,7 +1,10 @@
 <% layout('layout.html', {page: 'Dashboard'})%>
 
 
+<div id="notif" class="container mx-auto mt-6 center">
+</div>
 <div class="container mx-auto mt-6 center">
+
 
   <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
     <div class="card bg-base-100 shadow-xl">
@@ -55,7 +58,13 @@
             </tbody>
           </table>
           <button class="btn btn-ghost btn-xs" onclick="selectAll()">Select all</button>
-          <button class="btn btn-ghost btn-xs" onclick="sendDownloadQueue()">Download</button>
+          <button id="downloadBtn" class="btn btn-ghost btn-xs" onclick="sendDownloadQueue()" value="">Download</button>
+          <select id="downloadLocation" class="select select-bordered select-xs ">
+            <option value="Movies">Movies</option>
+            <option value="Tv Shows">Tv Shows</option>
+            <option value="Anime Shows">Anime Shows</option>
+          </select>
+
         </div>
       </div>
     </div>
@@ -89,7 +98,7 @@
                 <td><%= srch.seeders %></td>
                 <td><%= srch.size %></td>
                 <td>
-                  <button class="btn btn-ghost btn-square" type="button" name="button" onclick="showFiles('<%= srch.links %>')"><i class="fa-solid fa-tv"></i></button>
+                  <button class="btn btn-ghost btn-square" type="button" name="button" onclick="showFiles('<%= srch.links %>', '<%= srch.magnetLink %>')"><i class="fa-solid fa-tv"></i></button>
                 </td>
                 <td>
                   <a href="<%= srch.magnetLink %>"><button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button></a>
@@ -137,7 +146,7 @@
     let table = document.getElementById('fileTable')
     table.innerHTML = ""
 
-    files.forEach( (file) => {
+    files.gatheredInfo.forEach( (file) => {
       let row = table.insertRow(-1)
       row.innerHTML = `
       <tr>
@@ -151,6 +160,8 @@
         </td>
       </tr>`
     })
+
+    document.getElementById('downloadBtn').value = files.magnetLink
   }
 
   async function getImdbData() {
@@ -170,7 +181,7 @@
     <h5>PG: ${imdbData.contentRating}</h5>
     <p>${imdbData.plot}</p>
     <div class="card-actions justify-end">
-      <button class="btn btn-primary"><a href="https://www.imdb.com/title/${imdbData.id}">IMdB</a></button>
+      <a href="https://www.imdb.com/title/${imdbData.id}" target="_blank"><button class="btn btn-primary">IMdB</button></a>
     </div>`
 
   }
@@ -195,6 +206,7 @@
   async function sendDownloadQueue() {
 
     let filesToDelete = []
+    const magnetLink =  document.getElementById('downloadBtn').value
 
     checkboxes = document.getElementsByName('fileCheckbox');
     for(var i=0, n=checkboxes.length;i<n;i++) {
@@ -204,12 +216,38 @@
     }
     console.log(filesToDelete);
 
+    const downloadLocation = document.getElementById("downloadLocation");
+
     const response = await fetch(`http://${window.location.host}/api/torrent/add`, {
       method: "POST",
-      body: new URLSearchParams({filesToDelete: filesToDelete})
+      body: new URLSearchParams({magnetLink: magnetLink, downloadLocation: downloadLocation.value, filesToDelete: filesToDelete})
     })
 
+    sendNotification('Show added to the download queue')
+
   }
+
+  function sendNotification(msg){
+
+    document.getElementById('notif').innerHTML = `
+      <div id="${msg}" class="alert alert-info shadow-lg mt-10">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>${msg}</span>
+        </div>
+      </div>
+    `
+    setTimeout(() => {
+      const el = document.getElementById(msg)
+      el.style.transition = "opacity "+5+"s ease";
+
+      el.style.opacity = 0;
+      setTimeout(function() {
+          el.parentNode.removeChild(el);
+      }, 5000)
+    }, 5000)
+  }
+
 
 
 

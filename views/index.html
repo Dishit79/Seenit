@@ -19,9 +19,9 @@
 
     <div class="card w-100 bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title place-content-center">Current Torrent Status</h2>
+        <h2 class="card-title place-content-center">Current Torrent Status<div id="websocketStatus" class="badge badge-error">Disconnected</div></h2>
         <div class="flex justify-center">
-          <div class="radial-progress" style="--value:70; --size:12rem; --thickness: 10px;">70%</div>
+          <div id="statusGraph" class="radial-progress" style="--value:00.00; --size:12rem; --thickness: 10px;">0%</div>
         </div>
         <p>Downloading in progress</p>
       </div>
@@ -76,3 +76,49 @@
   </div>
 
 </div>
+
+
+<script type="text/javascript">
+
+  getWebsocket()
+
+  async function getWebsocket() {
+
+    const socketServerRaw = await fetch(`http://${window.location.host}/api/torrent/current/ws`)
+    const socketServer = await socketServerRaw.json()
+
+
+    const ws = new WebSocket(socketServer.websocketLink);
+    ws.onopen = () => onOpen();
+    ws.onclose = () => onClose();
+    ws.onmessage = (event) => onMessage(event);
+  }
+
+  function onOpen() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-primary"
+    statusDiv.innerHTML = "Connected"
+    console.log("worked?");
+
+  }
+
+  function onClose() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-error"
+    statusDiv.innerHTML = "Disconnected"
+    console.log("worked?");
+  }
+
+  function onMessage(e) {
+
+    let statusGraph = document.getElementById('statusGraph')
+
+    const test = e.data.replace(/ INFO  rqbit                     > \[0]: /g, "").split(',')
+
+    statusGraph.style = `--value:${test[0].replace(/%.*/g,"")}; --size:12rem; --thickness: 10px;`
+    statusGraph.innerHTML = test[0].replace(/ \(.*/g,"")
+  }
+
+
+
+</script>

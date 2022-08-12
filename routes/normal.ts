@@ -29,6 +29,7 @@ export async function bitsearchInfo(link: string) {
       gatheredInfo.push($(link2).text())
     })
   })
+  const magnetLink = $('body > main > div.container.details-page-layout > div.details-box.view-box > div.dl-links > a:nth-child(2)').attr("href")
 
-  return gatheredInfo
+  return {gatheredInfo: gatheredInfo, magnetLink: magnetLink}
 }
