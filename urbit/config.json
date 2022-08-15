@@ -1,5 +1,5 @@
 {
-  "port": 5000,
+  "port": 5050,
   "version": "1.0.0",
   "server": "http://localhost:5000",
   "unixName": "nawaf"

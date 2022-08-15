@@ -12,7 +12,7 @@ const checks = [{name:'version', type:"string"},{name:'server', type:"string"},{
 const config = await validateConfig(checks)
 
 const app = opine();
-const port = 5050;
+const port = config.port;
 app.use(urlencoded());
 app.use("/", ws)
 
