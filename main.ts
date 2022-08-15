@@ -6,7 +6,7 @@ import { torrent } from "./routes/torrent.ts"
 import { logger } from "./utils.ts"
 import { validateConfig } from "./utils/config.ts"
 
-const checks = [{name:'server', type:"string"},{name:'wsServer', type:"string"},{name:'port', type:"number"},{name:'downloadLocation', type:"object"}]
+const checks = [{name:'server', type:"string"},{name:'wsServer', type:"string"},{name:'port', type:"number"},{name:'downloadLocation', type:"object"},{name:'imdbKey', type:"string"}]
 const config = await validateConfig(checks)
 
 const app = opine()

@@ -1,24 +1,88 @@
-## <center><ins>seenit</ins></center>
 
-![https://img.shields.io/chocolatey/dt/git](https://img.shields.io/apm/l/vim-mode)
+# Seenit
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-! Disclaimer
-We (seenit) does NOT endorse software piracy, or piracy of any form, this program is a torrent scrapper for bitsearch, we don't condone the download of these films, however it is at your own discretion of what you do with it, we do not claim any responsibility for YOUR actions and what you use this program for, this is simply made for educational purposes only.
+Seenit is an opensource content and media manger which automatically finds and handles your media. Built with TypeScript and Deno, seenit exceptionally reliable and fast for your needs.
+## Demo
 
-# what has seenit?
+![image](https://us-east-1.tixte.net/uploads/dishit.tixte.co/2022-08-15_16-31-50.gif)
+## Deployment
 
-Seen it is an open source torrent scrapper for bitsearch that will automatically upload torrented video or movies to your plex server, with a nice front end design, this is made to be ran off a webserver and made using TS HTML CSS.
+Follow this [video]() (coming soon!)
 
-# FAQ
 
-what is bitsearch?
+## Run Locally
 
-> bitsearch is a search indexer for torrents
+Clone the project
 
-how do i use this?
+```bash
+  git clone https://github.com/Dishit79/Seenit.git
+```
 
-> this is made to be ran off of a webserver that can run typescript.
+### Running Seenit
 
-seenit 2022
+Go to the project directory
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```bash
+  cd Seenit
+```
+
+Edit the config file
+
+```bash
+  nano config.json
+```
+
+To run Seenit
+
+```bash
+  deno run --allow-all main.ts
+```
+### Running urbit
+
+Go to the urbit directory
+
+```bash
+  cd urbit
+```
+
+Edit the config file
+
+```bash
+  nano config.json
+```
+
+Start the urbit server
+
+```bash
+  deno run --allow-all main.ts
+```
+
+
+## Acknowledgements
+
+ - [rqbit](https://github.com/ikatson/rqbit)
+ - [Deno's Discord Server](https://discord.gg/deno)
+
+
+## Roadmap
+
+- Support show tracking
+
+- Add more sources
+
+- Add anime support
+
+- Add kdrama support
+
+
+## Support
+
+For support, dm Dishit#1600 or join our [Discord](https://discord.gg/t8mC4YcF) server.
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+We (seenit) do NOT endorse media piracy, or piracy of any form.

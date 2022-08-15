@@ -31,9 +31,9 @@ api.get("/info", async (req,res) => {
 })
 
 api.get("/imdb/:title", async (req,res) => {
-  const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/k_lvt14v8j/${req.params.title}`)
+  const imdbRes = await fetch(`https://imdb-api.com/en/API/SearchTitle/${config.imdbKey}/${req.params.title}`)
   const id = await imdbRes.json()
-  const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/k_lvt14v8j/${id.results[0].id}`)
+  const imdbDataRaw = await fetch(`https://imdb-api.com/en/API/Title/${config.imdbKey}/${id.results[0].id}`)
   const imdbData = await imdbDataRaw.json()
   res.send(imdbData)
 })
