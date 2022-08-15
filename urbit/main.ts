@@ -3,21 +3,18 @@ import {readableStreamFromReader,writableStreamFromWriter,} from "https://deno.l
 import { mergeReadableStreams } from "https://deno.land/std/streams/merge.ts";
 import { TextLineStream } from "https://deno.land/std@0.144.0/streams/mod.ts";
 import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
-import { getConfig, validateConfig  } from "https://gist.githubusercontent.com/Dishit79/65f0c7b8188557c86d68022dfa07f543/raw/47c86def8ebe51754eb17179eb844385ef31c8f5/config.ts";
-import { handleFiles } from "./files.ts"
+import { validateConfig  } from "https://gist.githubusercontent.com/Dishit79/65f0c7b8188557c86d68022dfa07f543/raw/7c8b30b89c9f20c4be1ce7d132bf91a099cf5bd8/config.ts";
+import { handleFiles, resetFiles } from "./files.ts"
 import { ws } from "./ws.ts"
 
 
-const checks = [{name:'version', type:"string"},{name:'server', type:"string"},{name:'unixName', type:"string"}]
-await validateConfig(checks)
-const config = await getConfig()
+const checks = [{name:'version', type:"string"},{name:'server', type:"string"},{name:'unixName', type:"string"},{name:'port', type:"number"}]
+const config = await validateConfig(checks)
 
 const app = opine();
 const port = 5050;
 app.use(urlencoded());
 app.use("/", ws)
-
-const startTime = Date.now()
 
 class Instance {
   id: string;
@@ -26,7 +23,6 @@ class Instance {
   process: any
 
   constructor(id: string, torrent:string, downloadLocation:string) {
-    console.log("created");
     this.id = id;
     this.torrent = torrent
     this.downloadLocation = downloadLocation
@@ -51,7 +47,6 @@ class Instance {
 
   async start(filesToDelete: string[]) {
 
-    console.log(this.torrent);
     this.process = Deno.run({
       cmd: ["./rqbit", "download", "-o", this.id, this.torrent],
       stdout: "piped",
@@ -88,13 +83,14 @@ app.post("/torrent/add", async (req, res) => {
   const filesToDelete = filesToDeleteRaw.split(',')
 
   const instance = new Instance(id, torrent, downloadLocation)
+  console.log('torrent added to server');
   instance.start(filesToDelete)
   res.send("started")
 })
 
 app.get("/status", async (req, res) => {
   const version = config.version
-  const uptime = Date.now() - startTime
+  const uptime = performance.now()
   const storage = null
   const ram = Deno.memoryUsage()
   const cpu = navigator.hardwareConcurrency
@@ -103,6 +99,11 @@ app.get("/status", async (req, res) => {
     return await tmp.text()
   }
   res.send({version: version, uptime: uptime, storage:storage, ram:ram, cpu:cpu, ip: await ip()})
+});
+
+app.post("/reset", async (req, res) => {
+  await resetFiles()
+  res.send("ok")
 });
 
 

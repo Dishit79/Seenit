@@ -44,17 +44,14 @@ async function websocketStatus(id: string, socket:WebSocket) {
   pipeThroughWebsocket(process.stdout, process, socket);
   pipeThroughWebsocket(process.stderr, process, socket);
   await process.status();
-  console.log("Done websocket");
 }
 
 const handleSocket = async (socket: WebSocket, id: string) => {
 
   socket.addEventListener("close", () => {
-    console.log("Socket closed");
   });
 
   socket.addEventListener("open", async () => {
-    console.log("Connected");
     const check = await exists(id)
 
     if (check){
@@ -65,11 +62,10 @@ const handleSocket = async (socket: WebSocket, id: string) => {
   })
 }
 
-//req.params.id
+
 ws.get("/ws/:id", async (req, res) => {
   if (req.headers.get("upgrade") === "websocket") {
     const socket = req.upgrade()
-    console.log("hit")
     handleSocket(socket, req.params.id)
   } else {
     res.send("Ok?")

@@ -18,4 +18,5 @@ export async function validateConfig(checks: any[]) {
       throw `"${i.name}" does not exist or does not have the correct type in the config file`
     }
   })
+  return config
 }

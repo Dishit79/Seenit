@@ -64,11 +64,11 @@ async function downloadHandler(magnet:MagnetObject) {
       body: new URLSearchParams({
         'id': magnet.id,
         'magnetLink': magnet.uri,
-        'filesToDelete': magnet.filesToDelete,
+        'filesToDelete': magnet.filesToDelete.toString(),
         'downloadLocation': magnet.downloadLocation })
     })
     await updateMagStatus(magnet.id, 1)
-    console.log("Torrent added to server");
+    logger("Torrent added to server");
   }
 }
 
@@ -80,6 +80,12 @@ async function downloadNext() {
   }
 }
 
+torrent.get("/queue", async (req,res) => {
+  const currentTorrent = await getRunningMag()
+  const queueTorrents = await db.findMany({ downloaded:  0 });
+   res.send({currentTorrent: currentTorrent, queueTorrents: queueTorrents})
+})
+
 torrent.post("/add", async (req,res) => {
 
   logger("huh?")
@@ -87,8 +93,8 @@ torrent.post("/add", async (req,res) => {
   const downloadLocation = req.body.downloadLocation
   const filesToDelete = () => {
     let files = req.body.filesToDelete.split(',')
-    let filesToDelete = []
-    files.forEach(file => {
+    let filesToDelete: string[] = []
+    files.forEach((file: any) => {
       filesToDelete.push(file.replace(/ - [0-9].*/g,""))
     })
     return filesToDelete
@@ -110,14 +116,39 @@ torrent.post("/completed", async (req,res) => {
    res.send("Thank you ")
 })
 
+torrent.post("/reset", async (req,res) => {
+  const currentTorrent = await getRunningMag()
+  if (currentTorrent){
+    await updateMagStatus(currentTorrent.id, 0)
+  }
+
+  try {
+    await fetch(`${api}/reset`, {
+      method: "POST"})
+  } catch (e) {
+    logger(e)
+  }
+  await downloadNext()
+  res.send("Thank you ")
+})
 
 torrent.get("/current", async (req,res) => {
   const currentTorrent = await getRunningMag()
   res.send(currentTorrent)
 })
 
-torrent.get("/current/ws/", async (req,res) => {
+torrent.get("/current/ws", async (req,res) => {
   const currentTorrent = await getRunningMag()
-  const result = {id: currentTorrent.id, websocketLink: `ws://${ws}/ws/${currentTorrent.id}`}
+  const result = {id: currentTorrent!.id, websocketLink: `ws://${ws}/ws/${currentTorrent!.id}`, apiLink: api }
   res.send(result)
+})
+
+torrent.get("/current/status", async (req,res) => {
+  try {
+    const dataRaw = await fetch(`${api}/status`)
+    const data = await dataRaw.json()
+    res.send(data)
+  } catch (e) {
+    res.send({active: false})
+  }
 })

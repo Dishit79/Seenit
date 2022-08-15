@@ -1,80 +1,12 @@
 [
 	{
-		"id": "57703222-3294-4f0e-93e0-756b7cddc5b0",
-		"uri": "magnet:?xt=urn:btih:4F6D9DBF85324C9B4CB8B968CDB9CCB55B785572",
-		"downloadLocation": "Anime Shows",
-		"filesToDelete": [
-			""
-		],
-		"downloaded": 2
-	},
-	{
-		"id": "463be1cc-977a-4630-b6f4-65cecc4d2f67",
-		"uri": "magnet:?xt=urn:btih:D67281864031E5012B056C32EBDC6F9E33C42A44",
-		"downloadLocation": "Movies",
-		"filesToDelete": [
-			"Monsters.Inc.2001.1080p.BrRip.x264.YIFY.srt",
-			"WWW.YIFY-TORRENTS.COM.jpg"
-		],
-		"downloaded": 2
-	},
-	{
-		"id": "836c3584-4ecb-49c5-a54c-c9886f98da83",
-		"uri": "magnet:?xt=urn:btih:C9E15763F722F23E98A29DECDFAE341B98D53056",
-		"downloadLocation": "Anime Shows",
-		"filesToDelete": [
-			"Cosmos Laundromat.en.srt",
-			"Cosmos Laundromat.es.srt",
-			"Cosmos Laundromat.fr.srt",
-			"Cosmos Laundromat.it.srt",
-			"poster.jpg"
-		],
-		"downloaded": 2
-	},
-	{
-		"id": "96ecab6b-0c3e-4312-8eed-72d9f683fd13",
-		"uri": "magnet:?xt=urn:btih:4BB5B969AB7810E1A3993654D7F982A740861E91",
-		"downloadLocation": "Movies",
-		"filesToDelete": [
-			""
-		],
-		"downloaded": 2
-	},
-	{
-		"id": "28ebc1fe-9eec-4186-a528-b3e8bb452e2d",
-		"uri": "magnet:?xt=urn:btih:47163578B3E88D7DF6915890BFBC160F678F2272",
-		"downloadLocation": "Tv Shows",
-		"filesToDelete": [
-			"Silicon Valley S04E09 Hooli-Con.mkv",
-			"Silicon Valley S04E10 Server Error.mkv",
-			"Silicon Valley S04E06 Customer Service.mkv",
-			"Silicon Valley S04E03 Intellectual Property.mkv",
-			"Silicon Valley S04E07 The Patent Troll.mkv",
-			"Silicon Valley S04E01 Success Failure.mkv",
-			"Silicon Valley S04E05 The Blood Boy.mkv",
-			"Silicon Valley S04E08 The Keenan Vortex.mkv",
-			"Silicon Valley S04E04 Teambuilding Exercise.mkv"
-		],
-		"downloaded": 2
-	},
-	{
-		"id": "cd711b2a-2828-4f24-b0c2-60f96a1ca015",
-		"uri": "magnet:?xt=urn:btih:D67281864031E5012B056C32EBDC6F9E33C42A44",
-		"downloadLocation": "Movies",
-		"filesToDelete": [
-			"Monsters.Inc.2001.1080p.BrRip.x264.YIFY.srt",
-			"WWW.YIFY-TORRENTS.COM.jpg"
-		],
-		"downloaded": 2
-	},
-	{
 		"id": "adaf55e0-03a6-466e-b9f1-79a9e29dc277",
 		"uri": "magnet:?xt=urn:btih:EFE1F78472A27DDDE7C74EA68705F40F4FE5D198",
 		"downloadLocation": "Anime Shows",
 		"filesToDelete": [
 			""
 		],
-		"downloaded": 2
+		"downloaded": 0
 	},
 	{
 		"id": "53a6b6d3-c42f-4d61-bfbf-8c59211d6e9c",
@@ -84,6 +16,15 @@
 			"Monsters.Inc.2001.1080p.BrRip.x264.YIFY.srt",
 			"WWW.YIFY-TORRENTS.COM.jpg"
 		],
-		"downloaded": 2
+		"downloaded": 0
+	},
+	{
+		"id": "27a12dde-263d-49fb-847f-cba5bce018d2",
+		"uri": "magnet:?xt=urn:btih:4DB3FDD949B99781E6AB1979BA476EC3E932970C",
+		"downloadLocation": "Movies",
+		"filesToDelete": [
+			"www.YTS.AM.jpg"
+		],
+		"downloaded": 0
 	}
 ]

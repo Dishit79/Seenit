@@ -1,6 +1,8 @@
 import { Router } from "https://deno.land/x/opine/mod.ts";
 import { bitsearch, bitsearchInfo} from "./normal.ts";
+import { getConfig } from "../utils/config.ts"
 
+const config = await getConfig()
 
 export const api = new Router
 

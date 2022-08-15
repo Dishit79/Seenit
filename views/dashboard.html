@@ -19,7 +19,7 @@
 
   <div class="grid gap-4 grid-cols-2 grid-rows-1 mt-10">
     <div class="card card-side bg-base-100 shadow-xl">
-      <img id="imdbImg" width="200" height="200" src="https://media.discordapp.net/attachments/823619941810307086/1006978110702493807/unknown.png" alt="Movie">
+      <img id="imdbImg" width="200" height="200" src="https://imgur.com/undefined" alt="Movie">
       <div id="imdbInfo" class="card-body">
         <h2 class="card-title">IMDb<div class="badge badge-primary">0.0</div></h2>
         <h5>Year: 2020</h5>
@@ -60,9 +60,10 @@
           <button class="btn btn-ghost btn-xs" onclick="selectAll()">Select all</button>
           <button id="downloadBtn" class="btn btn-ghost btn-xs" onclick="sendDownloadQueue()" value="">Download</button>
           <select id="downloadLocation" class="select select-bordered select-xs ">
-            <option value="Movies">Movies</option>
-            <option value="Tv Shows">Tv Shows</option>
-            <option value="Anime Shows">Anime Shows</option>
+
+            <% it.downloadLocation.forEach(function(loc) {%>
+            <option value="<%= loc %>"><%= loc %></option>
+            <% }) %>
           </select>
 
         </div>
@@ -237,6 +238,8 @@
         </div>
       </div>
     `
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
     setTimeout(() => {
       const el = document.getElementById(msg)
       el.style.transition = "opacity "+5+"s ease";
