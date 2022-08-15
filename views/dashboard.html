@@ -1,13 +1,16 @@
 <% layout('layout.html', {page: 'Dashboard'})%>
 
 
+<div id="notif" class="container mx-auto mt-6 center">
+</div>
 <div class="container mx-auto mt-6 center">
+
 
   <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
         <h2 class="card-title">Search:</h2>
-        <input type="text" placeholder="Type here" class="input input-bordered " />
+        <input id="searchBar" type="text" placeholder="Type here" class="input input-bordered" onkeydown="searchFunction(this)" />
       </div>
     </div>
   </div>
@@ -16,14 +19,14 @@
 
   <div class="grid gap-4 grid-cols-2 grid-rows-1 mt-10">
     <div class="card card-side bg-base-100 shadow-xl">
-      <img width="200" height="200" src="https://m.media-amazon.com/images/M/MV5BN2NkYTdlYjAtNWY5NC00MTY0LWIyZTItNmViMWJjNWM3YzUzXkEyXkFqcGdeQXVyMTE2NTYzNTQy._V1_Ratio0.7046_AL_.jpg" alt="Movie">
-      <div class="card-body">
-        <h2 class="card-title">Lakshya<div class="badge badge-primary">5.3</div></h2>
-        <h5>Year: 2021</h5>
+      <img id="imdbImg" width="200" height="200" src="https://imgur.com/undefined" alt="Movie">
+      <div id="imdbInfo" class="card-body">
+        <h2 class="card-title">IMDb<div class="badge badge-primary">0.0</div></h2>
+        <h5>Year: 2020</h5>
         <h5>PG: null </h5>
-        <p>Pardhu is an archer who wants to represent India at the World Championships. How does he bounce back and achieve what he wants after losing track? </p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  </p>
         <div class="card-actions justify-end">
-          <button class="btn btn-primary"><a href="/">IMdB</a></button>
+          <button class="btn btn-primary" onclick="getImdbData()">Load IMdB Data</button>
         </div>
       </div>
     </div>
@@ -41,7 +44,7 @@
                 <th></th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="fileTable">
               <tr>
                 <th>
                   <label>
@@ -54,7 +57,15 @@
               </tr>
             </tbody>
           </table>
-          <button class="btn btn-ghost btn-xs">details</button>
+          <button class="btn btn-ghost btn-xs" onclick="selectAll()">Select all</button>
+          <button id="downloadBtn" class="btn btn-ghost btn-xs" onclick="sendDownloadQueue()" value="">Download</button>
+          <select id="downloadLocation" class="select select-bordered select-xs ">
+
+            <% it.downloadLocation.forEach(function(loc) {%>
+            <option value="<%= loc %>"><%= loc %></option>
+            <% }) %>
+          </select>
+
         </div>
       </div>
     </div>
@@ -66,9 +77,9 @@
       <div class="card-body">
         <h2 class="card-title">Files Found</h2>
         <p>Testing dsfsdfsdfsd</p>
-        <div class="overflow-x-auto">
+        <div class="overflow-auto max-h-screen">
           <table class="table w-full">
-            <!-- head -->
+
             <thead>
               <tr>
                 <th>File Name</th>
@@ -80,39 +91,170 @@
               </tr>
             </thead>
             <tbody>
-              <!-- row 1 -->
+
+            <% it.searchResult.forEach(function(srch) {%>
               <tr>
-                <th>1980 ACDC - Back In Black (2020 Hi-Res 24.96) flac</th>
-                <td>Other/Audio</td>
-                <td>129</td>
-                <td>1.04 GB</td>
+                <th onclick="getFiles('<%= srch.links %>')" class="truncate ..." style="max-width:200px"><%= srch.name %></th>
+                <td><%= srch.type %></td>
+                <td><%= srch.seeders %></td>
+                <td><%= srch.size %></td>
                 <td>
-                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-tv"></i></button>
+                  <button class="btn btn-ghost btn-square" type="button" name="button" onclick="showFiles('<%= srch.links %>', '<%= srch.magnetLink %>')"><i class="fa-solid fa-tv"></i></button>
                 </td>
                 <td>
-                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button>
+                  <a href="<%= srch.magnetLink %>"><button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button></a>
                 </td>
               </tr>
-              <tr>
-                <th>1980 ACDC - Back In Black (2020 Hi-Res 24.96) flac</th>
-                <td>Other/Audio</td>
-                <td>129</td>
-                <td>1.04 GB</td>
-                <td>
-                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-tv"></i></button>
-                </td>
-                <td>
-                  <button class="btn btn-ghost btn-square" type="button" name="button"><i class="fa-solid fa-file-arrow-down"></i></button>
-                </td>
-              </tr>
-              
+            <% }) %>
 
             </tbody>
           </table>
         </div>
       </div>
     </div>
-
   </div>
 
 </div>
+
+<script type="text/javascript">
+
+  preloadSearchbar()
+  let selectAllState = true
+
+  async function preloadSearchbar() {
+  var searchBar = document.getElementById('searchBar')
+
+  const params = new URLSearchParams(window.location.search)
+  const search = (params.get('q'));
+
+  searchBar.value = search
+  }
+
+  async function searchFunction(data) {
+    if (event.key != 'Enter') {
+      return
+    }
+    if (data.value != ""){
+      window.location.replace(`http://${window.location.host}/dash?q=${data.value}`);
+    }
+  }
+
+  async function getFiles(magnet){
+
+    const filesRaw = await fetch(`http://${window.location.host}/api/info?q=${magnet}`)
+    const files = await filesRaw.json()
+
+    let table = document.getElementById('fileTable')
+    table.innerHTML = ""
+
+    files.gatheredInfo.forEach( (file) => {
+      let row = table.insertRow(-1)
+      row.innerHTML = `
+      <tr>
+        <th>
+          <label>
+            <input name="fileCheckbox" type="checkbox" class="checkbox" value="${file}"/>
+          </label>
+        </th>
+        <td>
+          ${file}
+        </td>
+      </tr>`
+    })
+
+    document.getElementById('downloadBtn').value = files.magnetLink
+  }
+
+  async function getImdbData() {
+    const params = new URLSearchParams(window.location.search)
+    const title = (params.get('q'));
+
+    const imdbDataRaw = await fetch(`http://${window.location.host}/api/imdb/${title}`)
+    const imdbData = await imdbDataRaw.json()
+
+    let imdbInfo = document.getElementById('imdbInfo')
+    imdbInfo.innerHTML = ''
+    document.getElementById('imdbImg').src = imdbData.image
+
+    imdbInfo.innerHTML = `
+    <h2 class="card-title">${imdbData.title}<div class="badge badge-primary">${imdbData.imDbRating}</div></h2>
+    <h5>Year: ${imdbData.year}</h5>
+    <h5>PG: ${imdbData.contentRating}</h5>
+    <p>${imdbData.plot}</p>
+    <div class="card-actions justify-end">
+      <a href="https://www.imdb.com/title/${imdbData.id}" target="_blank"><button class="btn btn-primary">IMdB</button></a>
+    </div>`
+
+  }
+
+  async function showFiles(magnet){
+    await getFiles(magnet)
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  async function selectAll(source) {
+  checkboxes = document.getElementsByName('fileCheckbox');
+  for(var i=0, n=checkboxes.length;i<n;i++) {
+    checkboxes[i].checked = selectAllState;
+  }
+  if (selectAllState){
+    selectAllState = false
+  } else {
+    selectAllState = true
+  }
+}
+
+  async function sendDownloadQueue() {
+
+    let filesToDelete = []
+    const magnetLink =  document.getElementById('downloadBtn').value
+
+    checkboxes = document.getElementsByName('fileCheckbox');
+    for(var i=0, n=checkboxes.length;i<n;i++) {
+      if (!checkboxes[i].checked) {
+        filesToDelete.push(checkboxes[i].value)
+      }
+    }
+    console.log(filesToDelete);
+
+    const downloadLocation = document.getElementById("downloadLocation");
+
+    const response = await fetch(`http://${window.location.host}/api/torrent/add`, {
+      method: "POST",
+      body: new URLSearchParams({magnetLink: magnetLink, downloadLocation: downloadLocation.value, filesToDelete: filesToDelete})
+    })
+
+    sendNotification('Show added to the download queue')
+
+  }
+
+  function sendNotification(msg){
+
+    document.getElementById('notif').innerHTML = `
+      <div id="${msg}" class="alert alert-info shadow-lg mt-10">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span>${msg}</span>
+        </div>
+      </div>
+    `
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    setTimeout(() => {
+      const el = document.getElementById(msg)
+      el.style.transition = "opacity "+5+"s ease";
+
+      el.style.opacity = 0;
+      setTimeout(function() {
+          el.parentNode.removeChild(el);
+      }, 5000)
+    }, 5000)
+  }
+
+
+
+
+
+
+
+</script>

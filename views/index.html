@@ -6,24 +6,26 @@
   <div class="grid gap-4 grid-cols-2 grid-rows-1 mt-10">
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title">Seenit Server Status<div class="badge badge-primary">Active</div></h2>
-        <p>Testing dsfsdfsdfsd</p>
-        <span>Version: v0.0.4</span>
-        <span>Ip Adress: 10.0.0.145</span>
-        <span>Uptime: 34Hr</span>
-        <span>Storage: <progress class="progress w-56" value="43" max="100"></progress></span>
-        <span>Ram: <progress class="progress w-56" value="43" max="100"></progress></span>
-        <span>Cpu: <progress class="progress w-56" value="43" max="100"></progress></span>
+        <h2 class="card-title">Seenit Server Status<div id="active" class="badge badge-primary">Active</div></h2>
+        <span class="countdown absolute right-0">
+          <span id="timer" style="--value:5;"></span>
+        </span>
+        <span id="version" >Version: v0.0.0</span>
+        <span id="ip" >Ip Adress: 0.0.0.0</span>
+        <span id="uptime" >Uptime: 0</span>
+        <span id="storage" >Storage: <progress class="progress w-56" value="0" max="100"></progress></span>
+        <span id="ram" >Ram: <progress class="progress w-56" value="0" max="10000000"></progress></span>
+        <span id="cpu" >Cpu Cores: 0</span>
       </div>
     </div>
 
     <div class="card w-100 bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title place-content-center">Current Torrent Status</h2>
+        <h2 class="card-title place-content-center">Current Torrent Status<div id="websocketStatus" class="badge badge-error">Disconnected</div></h2>
         <div class="flex justify-center">
-          <div class="radial-progress" style="--value:70; --size:12rem; --thickness: 10px;">70%</div>
+          <div id="statusGraph" class="radial-progress" style="--value:00.00; --size:12rem; --thickness: 10px;">0%</div>
         </div>
-        <p>Downloading in progress</p>
+        <p id="extraText">Nothing Downloading</p>
       </div>
     </div>
 
@@ -32,47 +34,164 @@
   <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title">Download Queue</h2>
-        <p>Testing dsfsdfsdfsd</p>
+
+        <h2 class="card-title">Download Queue <label for="resetModal" class="btn btn-xs modal-button">Reset</label></h2>
         <div class="overflow-x-auto">
           <table class="table w-full">
             <!-- head -->
             <thead>
               <tr>
                 <th></th>
-                <th>Name</th>
+                <th>Id</th>
+                <th>Download Location</th>
                 <th>Job</th>
-                <th>Favorite Color</th>
               </tr>
             </thead>
             <tbody>
-              <!-- row 1 -->
-              <tr>
-                <th>1</th>
-                <td>Cy Ganderton</td>
-                <td>Quality Control Specialist</td>
-                <td>Blue</td>
+
+              <% if (it.queue.currentTorrent) { %>
+              <tr class="active">
+                <th>Current</th>
+                <td><%= it.queue.currentTorrent.id %></td>
+                <td><%= it.queue.currentTorrent.downloadLocation %></td>
+                <td><%= it.queue.currentTorrent.downloaded %></td>
               </tr>
-              <!-- row 2 -->
+              <% } %>
+
+              <% for (let index = 0; index < it.queue.queueTorrents.length; index++) { %>
               <tr>
-                <th>2</th>
-                <td>Hart Hagerty</td>
-                <td>Desktop Support Technician</td>
-                <td>Purple</td>
+                <th><%= index + 1 %></th>
+                <td><%= it.queue.queueTorrents[index].id %></td>
+                <td><%= it.queue.queueTorrents[index].downloadLocation %></td>
+                <td><%= it.queue.queueTorrents[index].downloaded %></td>
               </tr>
-              <!-- row 3 -->
-              <tr>
-                <th>3</th>
-                <td>Brice Swyre</td>
-                <td>Tax Accountant</td>
-                <td>Red</td>
-              </tr>
+              <% } %>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-
   </div>
-
 </div>
+
+
+<input type="checkbox" id="resetModal" class="modal-toggle" />
+<div class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <label for="resetModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg">Reset queue?</h3>
+    <p class="py-4">If you click on confirm, you are confirming that there is no currently running torrent on the urbit server.</p>
+    <div class="">
+      <label onclick="reset()" class="btn">Confirm</label>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  let timer = 60
+
+  getWebsocket()
+  getServerInfo()
+  setInterval(function () {
+    timerGetServerInfo()
+  }, 1000);
+
+  async function getWebsocket() {
+
+    const socketServerRaw = await fetch(`http://${window.location.host}/api/torrent/current/ws`)
+    const socketServer = await socketServerRaw.json()
+
+
+    const ws = new WebSocket(socketServer.websocketLink);
+    ws.onopen = () => onOpen();
+    ws.onclose = () => onClose();
+    ws.onmessage = (event) => onMessage(event);
+  }
+
+  function onOpen() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-primary"
+    statusDiv.innerHTML = "Connected"
+    document.getElementById('extraText').innerHTML = `Downloading in progress`
+  }
+
+  function onClose() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-error"
+    statusDiv.innerHTML = "Disconnected"
+    document.getElementById('extraText').innerHTML = `Nothing Downloading`
+  }
+
+  function onMessage(e) {
+
+    let statusGraph = document.getElementById('statusGraph')
+
+    if ((/ INFO  rqbit                     > \[0]: /g).test(e.data)){
+      cleanData = e.data.replace(/ INFO  rqbit                     > \[0]: /g, "").split(',')
+    } else {
+      statusGraph.style = `--value:100; --size:12rem; --thickness: 10px;`
+      statusGraph.innerHTML = "100.00%"
+      return
+    }
+
+    statusGraph.style = `--value:${cleanData[0].replace(/%.*/g,"")}; --size:12rem; --thickness: 10px;`
+    statusGraph.innerHTML = cleanData[0].replace(/ \(.*/g,"")
+
+
+  }
+
+  async function getServerInfo() {
+
+    const dataRaw = await fetch(`http://${window.location.host}/api/torrent/current/status`)
+    const data = await dataRaw.json()
+
+      if (data.active == false){
+      document.getElementById('active').innerHTML = 'Inactive'
+      document.getElementById('active').className = 'badge badge-error'
+      return
+    }
+
+    document.getElementById('active').innerHTML = 'Active'
+    document.getElementById('active').className = 'badge badge-primary'
+    document.getElementById('version').innerHTML = `Version: v${data.version}`
+    document.getElementById('ip').innerHTML = `Ip Adress: ${data.ip}`
+    document.getElementById('uptime').innerHTML = `Uptime: ${msToTime(data.uptime)}`
+    document.getElementById('storage').innerHTML = `Storage: ${data.storage}`
+    document.getElementById('ram').innerHTML = `Ram: <progress class="progress w-56" value="${data.ram.heapUsed}" max="${data.ram.heapTotal}"></progress>`
+    document.getElementById('cpu').innerHTML = `Cpu Cores: ${data.cpu}`
+
+  }
+
+  function timerGetServerInfo() {
+    timer -= 1
+    if (timer <= 0) {
+      timer = 60
+      getServerInfo()
+    }
+    document.getElementById('timer').style = `--value:${timer};`
+  }
+
+  function msToTime(duration) {
+    var milliseconds = Math.floor((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+  }
+
+  async function reset() {
+    const response = await fetch(`http://${window.location.host}/api/torrent/reset`, {
+      method: "POST",
+    })
+
+    location.reload();
+
+  }
+
+</script>

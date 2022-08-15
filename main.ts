@@ -4,15 +4,16 @@ import { renderFile } from "https://deno.land/x/eta/mod.ts";
 import { api } from "./routes/api.ts"
 import { torrent } from "./routes/torrent.ts"
 import { logger } from "./utils.ts"
-import { validateConfig, getConfig } from "./utils/config.ts"
+import { validateConfig } from "./utils/config.ts"
 
+const checks = [{name:'server', type:"string"},{name:'wsServer', type:"string"},{name:'port', type:"number"},{name:'downloadLocation', type:"object"}]
+const config = await validateConfig(checks)
 
 const app = opine()
-const port = 5000
-const __dirname = dirname(import.meta.url)
+const port = config.port
+const downloadLocation = config.downloadLocation
 
 app.engine(".html", renderFile);
-// app.use('/assets', serveStatic(join(__dirname, "assets")));
 app.set("view engine", "html");
 
 app.set("view cache", false)
@@ -22,37 +23,23 @@ app.use("/api", api)
 app.use("/api/torrent", torrent)
 
 
-const checks = [{name:'server', type:"string"},{name:'wsServer', type:"string"}]
-await validateConfig(checks)
-
-
-app.get("/", (req,res)=> {
-  res.render("index")
+app.get("/", async (req,res) => {
+  const queue = await fetch(`http://localhost:${port}/api/torrent/queue`)
+  res.render("index", { queue: await queue.json() })
 })
 
-app.get("/dash", (req,res)=> {
-  res.render("dashboard")
-})
-
-
-app.get("/search", async (req,res)=> {
+app.get("/dash", async (req,res) => {
 
   if (!req.query.q) {
       res.setStatus(400).send({status:400, error:'no valid search query'})
-    }
-
-  const search = await fetch(`http://localhost:5000/api/search?q=${req.query.q}`)
-
-  logger("Search endpoint hit")
-
-  res.render("dashboard", { searchResult: await search.json()})
-
+      }
+  const search = await fetch(`http://localhost:${port}/api/search?q=${req.query.q}`)
+  res.render("dashboard", { searchResult: await search.json(), downloadLocation: downloadLocation })
 })
 
-app.get("/console", async (req,res)=> {
+app.get("/con", (req,res) => {
   res.render("console")
 })
-
 
 app.listen(port);
 console.log(`Opine started on localhost:${port}`)

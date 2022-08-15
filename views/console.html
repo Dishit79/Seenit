@@ -1,70 +1,146 @@
 <% layout('layout.html', {page: 'Console'}) %>
 
+<div class="container mx-auto mt-6 center">
 
-<div class="row">
+  <div class="relative flex">
 
-  <div class="col-12">
-    <div class="card card-chart">
-      <div class="card-header ">
-        <div class="row">
-          <div class="col-sm-6 text-left">
-            <h5 class="card-category" id='metaInfo'>Meta Info</h5>
-            <h2 class="card-title">Files:</h2>
-          </div>
-        </div>
-      </div>
+  <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10">
+    <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
-        <div class="row">
-          <div class="col-12 pr-md-1">
+        <h2 class="card-title">Seenit Server Status</h2>
+        <span class="countdown absolute right-0">
+          <span id="timer" style="--value:60;"></span>
+        </span>
+        <div class="flex justify-center">
+          <div id="statusGraph" class="radial-progress" style="--value:00.00; --size:12rem; --thickness: 10px;">0%</div>
+        </div>
+        <span id="version" >Version: v0.0.4</span>
+        <span id="ip" >Ip Adress: 10.0.0.145</span>
+        <span id="uptime" >Uptime: 34Hr</span>
+        <span id="storage" >Storage: <progress class="progress w-56" value="43" max="100"></progress></span>
+        <span id="ram" >Ram: <progress class="progress w-56" value="3854336" max="10000000"></progress></span>
+        <span id="cpu" >Cpu Cores: 4</span>
+      </div>
+    </div>
+  </div>
 
-            <div class="col-12 overflow-auto">
-              <div class="card card-tasks">
-                <div class="card-body">
-                  <div>
-                    <blockquote>
-                      <p class="blockquote blockquote-muted">
-                        <code id="log" class="overflow-auto"></code>
-                      </p>
-                    </blockquote>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div class="grid gap-4 grid-cols-1 grid-rows-1 mt-10 flex-1">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 id="websocketStatusParent" class="card-title">Bittorrent Client <div id="websocketStatus" class="badge badge-error">Disconnected</div></h2>
+        <div class="overflow-auto max-h-96">
+          <div id="downloadInfo" class="mockup-code">
           </div>
         </div>
       </div>
     </div>
   </div>
+
+</div>
 </div>
 
 
 <script type="text/javascript">
 
   let numMsg = 0
+  let timer = 60
 
-  main()
+  getWebsocket()
+  getServerInfo()
+  setInterval(function () {
+    timerGetServerInfo()
+  }, 1000);
 
-  async function main() {
+  async function getWebsocket() {
 
-    const rawLink = await fetch(`http://${window.location.host}/api/torrent/current/ws`)
-    const link = await rawLink.json()
+    const socketServerRaw = await fetch(`http://${window.location.host}/api/torrent/current/ws`)
+    const socketServer = await socketServerRaw.json()
 
-    console.log(link);
 
-    const socket = new WebSocket(link.websocketLink)
-    socket.onmessage = (event) => this.onMessage(event);
+    const ws = new WebSocket(socketServer.websocketLink);
+    ws.onopen = () => onOpen();
+    ws.onclose = () => onClose();
+    ws.onmessage = (event) => onMessage(event);
+  }
+
+  function onOpen() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-primary"
+    statusDiv.innerHTML = "Connected"
+    console.log("worked?");
+
+  }
+
+  function onClose() {
+    let statusDiv = document.getElementById('websocketStatus')
+    statusDiv.className = "badge badge-error"
+    statusDiv.innerHTML = "Disconnected"
+    console.log("worked?");
   }
 
   function onMessage(e) {
-    numMsg += 1
-    if (numMsg > 10) {
-      document.getElementById('log').innerHTML = "";
-      document.getElementById('log').innerHTML += (e.data + "<br>");
+
+     numMsg += 1
+     let cleanData = ''
+
+    let downloadInfo = document.getElementById('downloadInfo')
+    let statusGraph = document.getElementById('statusGraph')
+
+    if ((/ INFO  rqbit                     > \[0]: /g).test(e.data)){
+      cleanData = e.data.replace(/ INFO  rqbit                     > \[0]: /g, "").split(',')
+    } else {
+      statusGraph.style = `--value:100; --size:12rem; --thickness: 10px;`
+      statusGraph.innerHTML = "100.00%"
+      return
+    }
+
+
+    statusGraph.style = `--value:${cleanData[0].replace(/%.*/g,"")}; --size:12rem; --thickness: 10px;`
+    statusGraph.innerHTML = cleanData[0].replace(/ \(.*/g,"")
+
+    if (numMsg > 15) {
+      downloadInfo.innerHTML = ""
+      downloadInfo.innerHTML += (`<pre data-prefix=">" class="text-success"><code>${cleanData}</code></pre>`)
       numMsg = 0
     } else {
-      document.getElementById('log').innerHTML += (e.data + "<br>");
+      downloadInfo.innerHTML += (`<pre data-prefix=">" class="text-success"><code>${cleanData}</code></pre>`)
     }
   }
 
+  async function getServerInfo() {
+
+    const dataRaw = await fetch(`http://${window.location.host}/api/torrent/current/status`)
+    const data = await dataRaw.json()
+
+    document.getElementById('version').innerHTML = `Version: v${data.version}`
+    document.getElementById('ip').innerHTML = `Ip Adress: ${data.ip}`
+    document.getElementById('uptime').innerHTML = `Uptime: ${msToTime(data.uptime)}`
+    document.getElementById('storage').innerHTML = `Storage: ${data.storage}`
+    document.getElementById('ram').innerHTML = `Ram: <progress class="progress w-56" value="${data.ram.heapUsed}" max="${data.ram.heapTotal}"></progress>`
+    document.getElementById('cpu').innerHTML = `Cpu Cores: ${data.cpu}`
+
+  }
+
+  function timerGetServerInfo() {
+    timer -= 1
+    if (timer <= 0) {
+      timer = 60
+      getServerInfo()
+    }
+    document.getElementById('timer').style = `--value:${timer};`
+  }
+
+  function msToTime(duration) {
+    var milliseconds = Math.floor((duration % 1000) / 100),
+      seconds = Math.floor((duration / 1000) % 60),
+      minutes = Math.floor((duration / (1000 * 60)) % 60),
+      hours = Math.floor((duration / (1000 * 60 * 60)) % 24);
+
+    hours = (hours < 10) ? "0" + hours : hours;
+    minutes = (minutes < 10) ? "0" + minutes : minutes;
+    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+    return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+  }
 
 </script>

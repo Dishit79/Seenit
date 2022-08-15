@@ -3,25 +3,29 @@ import {readableStreamFromReader,writableStreamFromWriter,} from "https://deno.l
 import { mergeReadableStreams } from "https://deno.land/std/streams/merge.ts";
 import { TextLineStream } from "https://deno.land/std@0.144.0/streams/mod.ts";
 import { readLines } from "https://deno.land/std@0.104.0/io/mod.ts";
-import { getConfig, validateConfig  } from "https://gist.githubusercontent.com/Dishit79/65f0c7b8188557c86d68022dfa07f543/raw/47c86def8ebe51754eb17179eb844385ef31c8f5/config.ts";
+import { validateConfig  } from "https://gist.githubusercontent.com/Dishit79/65f0c7b8188557c86d68022dfa07f543/raw/7c8b30b89c9f20c4be1ce7d132bf91a099cf5bd8/config.ts";
+import { handleFiles, resetFiles } from "./files.ts"
+import { ws } from "./ws.ts"
 
-const checks = [{name:'server', type:"string"},{name:'unixName', type:"string"}]
-await validateConfig(checks)
-const config = await getConfig()
+
+const checks = [{name:'version', type:"string"},{name:'server', type:"string"},{name:'unixName', type:"string"},{name:'port', type:"number"}]
+const config = await validateConfig(checks)
 
 const app = opine();
-const port = 5050;
+const port = config.port;
 app.use(urlencoded());
+app.use("/", ws)
 
 class Instance {
   id: string;
   torrent: string
-  process: any;
+  downloadLocation: string
+  process: any
 
-  constructor(id: string, torrent:string) {
-    console.log("created");
+  constructor(id: string, torrent:string, downloadLocation:string) {
     this.id = id;
     this.torrent = torrent
+    this.downloadLocation = downloadLocation
   }
 
   async pipeThrough(reader: Deno.Reader,){
@@ -41,9 +45,8 @@ class Instance {
     }
   }
 
-  async start() {
+  async start(filesToDelete: string[]) {
 
-    console.log(this.torrent);
     this.process = Deno.run({
       cmd: ["./rqbit", "download", "-o", this.id, this.torrent],
       stdout: "piped",
@@ -56,17 +59,14 @@ class Instance {
 
     await Deno.remove(`${this.id}.txt`)
 
-    //move file to desired loc
-
-    //const move3 = Deno.run({cmd: ["mkdir",  `/home/nawaf/${this.id}`]})
-    const move = Deno.run({cmd: ["mv", `${this.id}`, `/home/${config.unixName}/`]})
+    await handleFiles(this.id, filesToDelete, this.downloadLocation)
 
     console.log("Done!");
     await sendBack(this.id)
   }
 };
 
-async function sendBack(id:string) {
+async function sendBack(id: string) {
 
   let t = await fetch(`${config.server}/api/torrent/completed`, {
     method: "POST",
@@ -78,83 +78,34 @@ async function sendBack(id:string) {
 app.post("/torrent/add", async (req, res) => {
   const id = req.body.id;
   const torrent = req.body.magnetLink;
-  const location = req.body.location;
+  const downloadLocation = req.body.downloadLocation;
+  const filesToDeleteRaw = req.body.filesToDelete;
+  const filesToDelete = filesToDeleteRaw.split(',')
 
-  const instance = new Instance(id, torrent)
-  instance.start()
+  const instance = new Instance(id, torrent, downloadLocation)
+  console.log('torrent added to server');
+  instance.start(filesToDelete)
   res.send("started")
+})
+
+app.get("/status", async (req, res) => {
+  const version = config.version
+  const uptime = performance.now()
+  const storage = null
+  const ram = Deno.memoryUsage()
+  const cpu = navigator.hardwareConcurrency
+  const ip = async () => {
+    let tmp = await fetch('https://api.ipify.org/')
+    return await tmp.text()
+  }
+  res.send({version: version, uptime: uptime, storage:storage, ram:ram, cpu:cpu, ip: await ip()})
 });
 
+app.post("/reset", async (req, res) => {
+  await resetFiles()
+  res.send("ok")
+});
 
-
-async function exists(filename: string) {
-  try {
-    await Deno.stat(`${filename}.txt`);
-    return true;
-  } catch (e) {
-    if (e && e instanceof Deno.errors.NotFound) {
-      return false;
-    } else {
-      throw e;
-    }
-  }
-}
-
-async function pipeThroughWebsocket(reader: Deno.Reader, process: Deno.Process, socket: WebSocket){
-
-  const encoder = new TextEncoder();
-  for await (const line of readLines(reader)) {
-    if (socket.readyState == 1){
-      socket.send(line)
-    } else {
-      await process.kill('SIGINT')
-      return
-    }
-  }
-}
-
-async function websocketStatus(id: string, socket:WebSocket) {
-
-  const process = Deno.run({
-    cmd: ["tail", "-F", `${id}.txt`],
-    stdout: "piped",
-    stderr: "piped",
-  })
-
-  pipeThroughWebsocket(process.stdout, process, socket);
-  pipeThroughWebsocket(process.stderr, process, socket);
-  await process.status();
-  console.log("Done websocket");
-}
-
-const handleSocket = async (socket: WebSocket, id: string) => {
-
-  socket.addEventListener("close", () => {
-    console.log("Socket closed");
-  });
-
-  socket.addEventListener("open", async () => {
-    console.log("Connected");
-    const check = await exists(id)
-
-    if (check){
-      await websocketStatus(id, socket)
-    } else {
-      socket.close()
-    }
-  })
-}
-
-//req.params.id
-app.get("/ws/:id", async (req, res) => {
-  if (req.headers.get("upgrade") === "websocket") {
-    const socket = req.upgrade()
-    console.log("hit")
-    handleSocket(socket, req.params.id)
-  } else {
-    res.send("Ok?")
-  }
-})
 
 app.listen(port);
 console.log(`Opine started on localhost:${port}`);

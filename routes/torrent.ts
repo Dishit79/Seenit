@@ -4,7 +4,6 @@ import { logger, generateId } from "../utils.ts"
 import { getConfig } from "../utils/config.ts"
 
 
-
 export const torrent = new Router
 const config = await getConfig()
 
@@ -15,6 +14,7 @@ interface Mag {
     id: string
     uri: string
     downloadLocation: string
+    filesToDelete: string[]
     downloaded: number
 }
 
@@ -25,17 +25,18 @@ export class MagnetObject {
   id: string
   uri: string
   downloadLocation: string
+  filesToDelete: string[]
   downloaded = 0
 
-  constructor(uri: string, downloadLocation: string, id:string | null = null) {
+  constructor(uri: string, downloadLocation: string, filesToDelete: string[], id:string | null = null) {
     if (!id){
       this.id = generateId()
     } else {
       this.id = id
     }
-
     this.uri = uri
     this.downloadLocation = downloadLocation
+    this.filesToDelete = filesToDelete
   }
 }
 
@@ -63,29 +64,49 @@ async function downloadHandler(magnet:MagnetObject) {
       body: new URLSearchParams({
         'id': magnet.id,
         'magnetLink': magnet.uri,
-        'loaction': 'movie'})
+        'filesToDelete': magnet.filesToDelete.toString(),
+        'downloadLocation': magnet.downloadLocation })
     })
     await updateMagStatus(magnet.id, 1)
-    console.log("Torrent added to server");
+    logger("Torrent added to server");
   }
 }
 
 async function downloadNext() {
   const idleTorrent = await getIdleMag()
   if (idleTorrent){
-    const mag = new MagnetObject(idleTorrent.uri, idleTorrent.downloadLocation, idleTorrent.id)
+    const mag = new MagnetObject(idleTorrent.uri, idleTorrent.downloadLocation, idleTorrent.filesToDelete, idleTorrent.id)
     await downloadHandler(mag)
   }
 }
 
+torrent.get("/queue", async (req,res) => {
+  const currentTorrent = await getRunningMag()
+  const queueTorrents = await db.findMany({ downloaded:  0 });
+   res.send({currentTorrent: currentTorrent, queueTorrents: queueTorrents})
+})
+
 torrent.post("/add", async (req,res) => {
-   console.log(req.body.magnetLink);
-   const uri = req.body.magnetLink
-   let magnet = new MagnetObject(uri, '/Documents/')
-   await addMag(magnet)
-   await downloadHandler(magnet)
-   logger("Search endpoint hit")
-   res.send("added to queue")
+
+  logger("huh?")
+  const uri = req.body.magnetLink
+  const downloadLocation = req.body.downloadLocation
+  const filesToDelete = () => {
+    let files = req.body.filesToDelete.split(',')
+    let filesToDelete: string[] = []
+    files.forEach((file: any) => {
+      filesToDelete.push(file.replace(/ - [0-9].*/g,""))
+    })
+    return filesToDelete
+  }
+
+  let magnet = new MagnetObject(uri, downloadLocation, filesToDelete())
+  console.log(magnet);
+
+  await addMag(magnet)
+  await downloadHandler(magnet)
+  logger("Torrent added Urbit server")
+  res.send("added to queue")
 })
 
 torrent.post("/completed", async (req,res) => {
@@ -95,11 +116,20 @@ torrent.post("/completed", async (req,res) => {
    res.send("Thank you ")
 })
 
-torrent.post("/completed", async (req,res) => {
-   console.log(req.body.id);
-   await updateMagStatus(req.body.id, 2)
-   await downloadNext()
-   res.send("Thank you ")
+torrent.post("/reset", async (req,res) => {
+  const currentTorrent = await getRunningMag()
+  if (currentTorrent){
+    await updateMagStatus(currentTorrent.id, 0)
+  }
+
+  try {
+    await fetch(`${api}/reset`, {
+      method: "POST"})
+  } catch (e) {
+    logger(e)
+  }
+  await downloadNext()
+  res.send("Thank you ")
 })
 
 torrent.get("/current", async (req,res) => {
@@ -107,8 +137,18 @@ torrent.get("/current", async (req,res) => {
   res.send(currentTorrent)
 })
 
-torrent.get("/current/ws/", async (req,res) => {
+torrent.get("/current/ws", async (req,res) => {
   const currentTorrent = await getRunningMag()
-  const result = {id: currentTorrent.id, websocketLink: `ws://${ws}/ws/${currentTorrent.id}`}
+  const result = {id: currentTorrent!.id, websocketLink: `ws://${ws}/ws/${currentTorrent!.id}`, apiLink: api }
   res.send(result)
+})
+
+torrent.get("/current/status", async (req,res) => {
+  try {
+    const dataRaw = await fetch(`${api}/status`)
+    const data = await dataRaw.json()
+    res.send(data)
+  } catch (e) {
+    res.send({active: false})
+  }
 })
