@@ -2,7 +2,7 @@
 # Seenit
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-Seenit is an opensource content and media manger which automatically finds and handles your media. Built with TypeScript and Deno, seenit exceptionally reliable and fast for your needs.
+Seenit is an opensource content and media manger which automatically finds and downloads your media. Built with TypeScript and Deno, seenit is exceptionally reliable and fast for your needs.
 ## Demo
 
 ![image](https://us-east-1.tixte.net/uploads/dishit.tixte.co/2022-08-15_16-31-50.gif)
