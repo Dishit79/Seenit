@@ -26,12 +26,15 @@ export async function bitsearchInfo(link: string) {
   // @ts-ignore
   const $ = cheerio.load(readableHtml);
 
-  $("body > main > div.container.details-page-layout > div.meta-box > div.w3-tabs > div.tab.view-box.show.files.primary-text > div > div").find(".file-list").each(function(i:any, link: any){
+  $("#alart-box > div.container.details-page-layout > div.meta-box > div.w3-tabs > div.tab.view-box.files.primary-text.show > div").find(".file-list").each(function(i:any, link: any){
     let t = $(link).find('.file-name').each(function(i2: any, link2: any){
       gatheredInfo.push($(link2).text())
     })
   })
-  const magnetLink = $('body > main > div.container.details-page-layout > div.details-box.view-box > div.dl-links > a:nth-child(2)').attr("href")
+  const magnetLink = $('#alart-box > div.container.details-page-layout > div.details-box.view-box > div.dl-links > a:nth-child(2)').attr("href")
+
+  console.log(magnetLink);
+
 
   return {gatheredInfo: gatheredInfo, magnetLink: magnetLink}
 }

@@ -1,9 +1,9 @@
 import { format } from "https://deno.land/std/datetime/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
+//import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 
 export function generateId() {
-  return v4.generate();
+  return crypto.randomUUID();
 }
 
 export async function logger(message:string) {
